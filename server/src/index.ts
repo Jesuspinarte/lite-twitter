@@ -1,24 +1,29 @@
+import 'reflect-metadata';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
+import { buildSchema } from 'type-graphql';
+import UserResolver from './resolvers/user';
 
 const prisma = new PrismaClient();
-const typeDefs = gql`
-  type Query {
-    hello: String!
-  }
-`;
-const resolvers = {
-  Query: {
-    hello: () => 'mom!',
-  },
-};
+// const typeDefs = gql`
+//   type Query {
+//     hello: String!
+//   }
+// `;
+// const resolvers = {
+//   Query: {
+//     hello: () => 'mom!',
+//   },
+// };
 
 async function main() {
   console.log('Creating server...');
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema: await buildSchema({
+      resolvers: [UserResolver],
+      validate: false,
+    }),
     context: async ({ req, res }) => ({
       ...req,
       ...res,
@@ -47,7 +52,7 @@ async function main() {
 
 main()
   .catch(e => {
-    throw e;
+    console.error(e);
   })
   .finally(async () => {
     await prisma.$disconnect();
