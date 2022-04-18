@@ -1,6 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
 
-import Comment from './Comment';
 import ErrorMessage from './ErrorMessage';
 import Tweet from './Tweet';
 import Vote from './Vote';
@@ -24,9 +23,6 @@ export default class User {
 
   @Field(() => [Tweet])
   tweets: Tweet[];
-
-  @Field(() => [Comment])
-  comments: Comment[];
 
   @Field(() => [Vote])
   votes: Vote[];
