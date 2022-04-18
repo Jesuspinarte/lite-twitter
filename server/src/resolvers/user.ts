@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import User, { UserResponse } from '../entities/User';
-import { UserInput } from '../inputs/UserInput';
+import UserInput from '../inputs/UserInput';
 
 @Resolver(User)
 export default class UserResolver {
