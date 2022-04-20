@@ -6,16 +6,6 @@ import { buildSchema } from 'type-graphql';
 import UserResolver from './resolvers/user';
 
 const prisma = new PrismaClient();
-// const typeDefs = gql`
-//   type Query {
-//     hello: String!
-//   }
-// `;
-// const resolvers = {
-//   Query: {
-//     hello: () => 'mom!',
-//   },
-// };
 
 async function main() {
   console.log('Creating server...');
@@ -45,9 +35,6 @@ async function main() {
       }`
     );
   });
-
-  // const allUsers = await prisma.user.findMany({ include: { tweets: true } });
-  // console.dir(allUsers, { depth: null });
 }
 
 main()

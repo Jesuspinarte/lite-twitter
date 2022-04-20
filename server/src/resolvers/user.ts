@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 
 import bcrypt from 'bcrypt';
@@ -6,13 +5,15 @@ import jwt from 'jsonwebtoken';
 
 import User, { UserResponse } from '../entities/User';
 import UserInput, { UserLoginInput } from '../inputs/UserInput';
+import { LTContext } from '../utils/types';
+import { getTokenPayload } from '../utils/helpers';
 
 @Resolver(User)
 export default class UserResolver {
   @Mutation(() => UserResponse)
   async register(
     @Arg('user') userInput: UserInput,
-    @Ctx() { prisma }: { prisma: PrismaClient }
+    @Ctx() { prisma }: LTContext
   ) {
     const password = await bcrypt.hash(userInput.password, 10);
     let newUser;
@@ -51,7 +52,7 @@ export default class UserResolver {
   @Mutation(() => UserResponse)
   async login(
     @Arg('user') userInput: UserLoginInput,
-    @Ctx() { prisma }: { prisma: PrismaClient }
+    @Ctx() { prisma }: LTContext
   ) {
     let user;
     let token;
@@ -98,8 +99,8 @@ export default class UserResolver {
     } catch (error) {
       console.log(error);
       errors.push({
-        field: 'fields',
-        message: 'Invalid input',
+        type: 'input',
+        message: 'Error processing the information.',
       });
 
       return { errors };
@@ -108,8 +109,40 @@ export default class UserResolver {
     return { token, user };
   }
 
+  @Query(() => UserResponse)
+  async currentUser(@Ctx() { prisma, req }: LTContext) {
+    let user;
+    let errors = [];
+
+    if (!req) {
+      errors.push({
+        type: 'authorization',
+        message: 'No authenticated user found.',
+      });
+
+      return { errors };
+    }
+
+    const authHeader = req.headers.authorization;
+
+    if (authHeader) {
+      const { userId } = getTokenPayload(authHeader);
+
+      user = await prisma.user.findUnique({ where: { id: userId } });
+
+      if (!user) {
+        errors.push({
+          type: 'session',
+          message: 'No user was found in session.',
+        });
+      }
+    }
+
+    return { user };
+  }
+
   @Query(() => [User])
-  async getAllUsers(@Ctx() { prisma }: { prisma: PrismaClient }) {
+  async getAllUsers(@Ctx() { prisma }: LTContext) {
     let users = [];
     try {
       users = await prisma.user.findMany();
