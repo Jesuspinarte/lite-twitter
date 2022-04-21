@@ -23,3 +23,15 @@ export class UserLoginInput {
   @Field()
   password: string;
 }
+
+@InputType()
+export class UserInfo {
+  @Field({ nullable: true })
+  email: string;
+
+  @Field()
+  username: string;
+
+  @Field({ nullable: true })
+  name: string;
+}

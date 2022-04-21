@@ -4,15 +4,15 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import User, { UserResponse } from '../entities/User';
-import UserInput, { UserLoginInput } from '../inputs/UserInput';
+import UserInput, { UserInfo, UserLoginInput } from '../inputs/UserInput';
 import { SECRET_KEY } from '../utils/constants';
 import { LTContext } from '../utils/types';
 import {
+  catchUserErrors,
   getTokenPayload,
-  validateEmail,
-  validatePassword,
-  validateUsername,
+  validateUserInput,
 } from '../utils/helpers';
+import ErrorMessage from '../entities/ErrorMessage';
 
 @Resolver(User)
 export default class UserResolver {
@@ -21,30 +21,7 @@ export default class UserResolver {
     @Arg('user') userInput: UserInput,
     @Ctx() { prisma }: LTContext
   ) {
-    let errors = [];
-
-    if (!validateEmail(userInput.email)) {
-      errors.push({
-        field: 'email',
-        message: 'The email structure is invalid.',
-      });
-    }
-
-    if (!validateUsername(userInput.username)) {
-      errors.push({
-        field: 'username',
-        message:
-          'The username is invalid, only lower characters, upper characters, numbers and the "-", "_" and "." characters are allowed. The username has to have from 6 to 16 characters',
-      });
-    }
-
-    if (!validatePassword(userInput.password)) {
-      errors.push({
-        field: 'password',
-        message:
-          'The password is invalid, it has to have 1 lower character, 1 upper character, 1 special character, 1 digit and has to be between 6 and 20 characters.',
-      });
-    }
+    let errors: ErrorMessage[] = [...validateUserInput(userInput)];
 
     if (errors.length) {
       return { errors };
@@ -61,20 +38,7 @@ export default class UserResolver {
 
       token = jwt.sign({ userId: newUser.id }, SECRET_KEY, { expiresIn: '7d' });
     } catch (error) {
-      if (error.meta.target === 'email_1') {
-        errors.push({
-          field: 'email',
-          message: 'Email is registered',
-        });
-      }
-
-      if (error.meta.target.includes('username_1')) {
-        errors.push({
-          field: 'username',
-          message: 'Username already taken',
-        });
-      }
-      return { errors };
+      return { errors: catchUserErrors(error) };
     }
 
     return { token, user: newUser };
@@ -142,6 +106,56 @@ export default class UserResolver {
     }
 
     return { token, user };
+  }
+
+  @Mutation(() => UserResponse)
+  async updateUserInfo(
+    @Arg('user') userInfo: UserInfo,
+    @Ctx() { prisma, req }: LTContext
+  ) {
+    let errors: ErrorMessage[] = [];
+    if (!req) {
+      errors.push({
+        type: 'authorization',
+        message: 'No authenticated user found.',
+      });
+
+      return { errors };
+    }
+
+    errors.push(...validateUserInput(userInfo));
+
+    if (errors.length) {
+      return { errors };
+    }
+
+    let user;
+
+    try {
+      const authHeader = req.headers.authorization;
+
+      if (authHeader) {
+        const { userId } = getTokenPayload(authHeader);
+
+        user = await prisma.user.update({
+          where: { id: userId },
+          data: { ...userInfo },
+        });
+
+        if (!user) {
+          errors.push({
+            type: 'session',
+            message: 'No user was found in session.',
+          });
+
+          return { errors };
+        }
+      }
+    } catch (error) {
+      return { errors: catchUserErrors(error) };
+    }
+
+    return { user };
   }
 
   @Query(() => UserResponse)
