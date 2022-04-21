@@ -31,10 +31,10 @@ export default class User {
 @ObjectType()
 export class UserResponse {
   @Field(() => [ErrorMessage], { nullable: true })
-  errors: ErrorMessage[];
+  errors?: ErrorMessage[];
 
   @Field({ nullable: true })
-  token: string;
+  token?: string;
 
   @Field(() => User, { nullable: true })
   user: User;

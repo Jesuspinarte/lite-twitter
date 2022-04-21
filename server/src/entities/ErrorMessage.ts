@@ -2,10 +2,10 @@ import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType()
 export default class ErrorMessage {
-  @Field()
+  @Field({ nullable: true })
   field?: string;
 
-  @Field()
+  @Field({ nullable: true })
   type?: string;
 
   @Field()

@@ -5,8 +5,14 @@ import jwt from 'jsonwebtoken';
 
 import User, { UserResponse } from '../entities/User';
 import UserInput, { UserLoginInput } from '../inputs/UserInput';
+import { SECRET_KEY } from '../utils/constants';
 import { LTContext } from '../utils/types';
-import { getTokenPayload } from '../utils/helpers';
+import {
+  getTokenPayload,
+  validateEmail,
+  validatePassword,
+  validateUsername,
+} from '../utils/helpers';
 
 @Resolver(User)
 export default class UserResolver {
@@ -15,20 +21,45 @@ export default class UserResolver {
     @Arg('user') userInput: UserInput,
     @Ctx() { prisma }: LTContext
   ) {
+    let errors = [];
+
+    if (!validateEmail(userInput.email)) {
+      errors.push({
+        field: 'email',
+        message: 'The email structure is invalid.',
+      });
+    }
+
+    if (!validateUsername(userInput.username)) {
+      errors.push({
+        field: 'username',
+        message:
+          'The username is invalid, only lower characters, upper characters, numbers and the "-", "_" and "." characters are allowed. The username has to have from 6 to 16 characters',
+      });
+    }
+
+    if (!validatePassword(userInput.password)) {
+      errors.push({
+        field: 'password',
+        message:
+          'The password is invalid, it has to have 1 lower character, 1 upper character, 1 special character, 1 digit and has to be between 6 and 20 characters.',
+      });
+    }
+
+    if (errors.length) {
+      return { errors };
+    }
+
     const password = await bcrypt.hash(userInput.password, 10);
     let newUser;
     let token;
-    let errors = [];
 
     try {
       newUser = await prisma.user.create({
         data: { ...userInput, password },
       });
 
-      token = jwt.sign(
-        { userId: newUser.id },
-        process.env.SECRET_KEY || '53cr3t'
-      );
+      token = jwt.sign({ userId: newUser.id }, SECRET_KEY, { expiresIn: '7d' });
     } catch (error) {
       if (error.meta.target === 'email_1') {
         errors.push({
@@ -37,7 +68,7 @@ export default class UserResolver {
         });
       }
 
-      if (error.meta.target === 'username_1') {
+      if (error.meta.target.includes('username_1')) {
         errors.push({
           field: 'username',
           message: 'Username already taken',
@@ -59,8 +90,13 @@ export default class UserResolver {
     let errors = [];
 
     try {
-      user = await prisma.user.findUnique({
-        where: { username: userInput.username },
+      user = await prisma.user.findFirst({
+        where: {
+          username: {
+            contains: userInput.username,
+            mode: 'insensitive',
+          },
+        },
       });
 
       if (!user) {
@@ -95,9 +131,8 @@ export default class UserResolver {
         return { errors };
       }
 
-      token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY || '53cr3t');
+      token = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '7d' });
     } catch (error) {
-      console.log(error);
       errors.push({
         type: 'input',
         message: 'Error processing the information.',
@@ -123,33 +158,30 @@ export default class UserResolver {
       return { errors };
     }
 
-    const authHeader = req.headers.authorization;
+    try {
+      const authHeader = req.headers.authorization;
 
-    if (authHeader) {
-      const { userId } = getTokenPayload(authHeader);
+      if (authHeader) {
+        const { userId } = getTokenPayload(authHeader);
 
-      user = await prisma.user.findUnique({ where: { id: userId } });
+        user = await prisma.user.findUnique({ where: { id: userId } });
 
-      if (!user) {
-        errors.push({
-          type: 'session',
-          message: 'No user was found in session.',
-        });
+        if (!user) {
+          errors.push({
+            type: 'session',
+            message: 'No user was found in session.',
+          });
+        }
       }
+    } catch (error) {
+      errors.push({
+        type: error.name,
+        message: error.message,
+      });
+
+      return { errors };
     }
 
     return { user };
-  }
-
-  @Query(() => [User])
-  async getAllUsers(@Ctx() { prisma }: LTContext) {
-    let users = [];
-    try {
-      users = await prisma.user.findMany();
-    } catch (error) {
-      throw new Error(error);
-    }
-
-    return users;
   }
 }
