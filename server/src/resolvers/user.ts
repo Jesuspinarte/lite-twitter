@@ -52,7 +52,7 @@ export default class UserResolver {
   @Mutation(() => UserResponse)
   async login(
     @Arg('user') userInput: UserLoginInput,
-    @Ctx() { prisma }: LTContext
+    @Ctx() { prisma, req }: LTContext
   ) {
     let user;
     let token;
@@ -101,6 +101,7 @@ export default class UserResolver {
       }
 
       token = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '7d' });
+      req.session.token = token;
     } catch (error) {
       errors.push({
         type: 'input',
@@ -264,6 +265,8 @@ export default class UserResolver {
   async currentUser(@Ctx() { prisma, req }: LTContext) {
     let user;
     let errors = [];
+
+    console.log(req.session.token);
 
     if (!req) {
       errors.push({

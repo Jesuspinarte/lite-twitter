@@ -1,9 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 
+interface LTSession {
+  session: {
+    token: string;
+  };
+}
+
 export interface LTContext {
   prisma: PrismaClient;
-  req: Request;
+  req: Request & LTSession;
   res: Response;
 }
 
