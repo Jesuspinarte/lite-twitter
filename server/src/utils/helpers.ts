@@ -5,7 +5,7 @@ import { SECRET_KEY } from './constants';
 import { UserTokenData } from './types';
 
 export const getTokenPayload = (token: string): UserTokenData => {
-  const userData = jwt.verify(token.replace('Baerer ', ''), SECRET_KEY);
+  const userData = jwt.verify(token.replace('Bearer ', ''), SECRET_KEY);
 
   return userData as UserTokenData;
 };
@@ -65,7 +65,7 @@ export const validateUserInput = (
 export const catchUserErrors = (error: any): ErrorMessage[] => {
   let errors: ErrorMessage[] = [];
 
-  if (error.meta.target === 'email_1') {
+  if (error.meta.target.includes('email_1')) {
     errors.push({
       field: 'email',
       message: 'Email is registered',

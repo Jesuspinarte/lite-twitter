@@ -35,3 +35,12 @@ export class UserInfo {
   @Field({ nullable: true })
   name: string;
 }
+
+@InputType()
+export class PasswordInput {
+  @Field()
+  password: string;
+
+  @Field()
+  newPassword: string;
+}

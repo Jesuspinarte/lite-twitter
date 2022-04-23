@@ -4,12 +4,17 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import User, { UserResponse } from '../entities/User';
-import UserInput, { UserInfo, UserLoginInput } from '../inputs/UserInput';
+import UserInput, {
+  PasswordInput,
+  UserInfo,
+  UserLoginInput,
+} from '../inputs/UserInput';
 import { SECRET_KEY } from '../utils/constants';
 import { LTContext } from '../utils/types';
 import {
   catchUserErrors,
   getTokenPayload,
+  validatePassword,
   validateUserInput,
 } from '../utils/helpers';
 import ErrorMessage from '../entities/ErrorMessage';
@@ -134,22 +139,119 @@ export default class UserResolver {
     try {
       const authHeader = req.headers.authorization;
 
-      if (authHeader) {
-        const { userId } = getTokenPayload(authHeader);
-
-        user = await prisma.user.update({
-          where: { id: userId },
-          data: { ...userInfo },
+      if (!authHeader) {
+        errors.push({
+          type: 'authorization',
+          message: 'No authorization token found.',
         });
 
-        if (!user) {
-          errors.push({
-            type: 'session',
-            message: 'No user was found in session.',
-          });
+        return { errors };
+      }
 
-          return { errors };
-        }
+      const { userId } = getTokenPayload(authHeader);
+
+      user = await prisma.user.update({
+        where: { id: userId },
+        data: { ...userInfo },
+      });
+
+      if (!user) {
+        errors.push({
+          type: 'session',
+          message: 'No user was found in session.',
+        });
+
+        return { errors };
+      }
+    } catch (error) {
+      return { errors: catchUserErrors(error) };
+    }
+
+    return { user };
+  }
+
+  @Mutation(() => UserResponse)
+  async changePassword(
+    @Arg('password') passwordInput: PasswordInput,
+    @Ctx() { prisma, req }: LTContext
+  ) {
+    let errors: ErrorMessage[] = [];
+    let user;
+
+    if (!req) {
+      errors.push({
+        type: 'authorization',
+        message: 'No authenticated user found.',
+      });
+
+      return { errors };
+    }
+
+    try {
+      const authHeader = req.headers.authorization;
+
+      if (!authHeader) {
+        errors.push({
+          type: 'authorization',
+          message: 'No authorization token found.',
+        });
+
+        return { errors };
+      }
+
+      const { userId } = getTokenPayload(authHeader);
+
+      user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        errors.push({
+          type: 'session',
+          message: 'No user was found in session.',
+        });
+
+        return { errors };
+      }
+
+      const valid = await bcrypt.compare(passwordInput.password, user.password);
+
+      if (!valid) {
+        errors.push({
+          field: 'password',
+          message: 'Wrong password.',
+        });
+
+        return { errors };
+      }
+
+      if (!validatePassword(passwordInput.newPassword)) {
+        console.log('hola');
+        errors.push({
+          field: 'newPassword',
+          message:
+            'The password is invalid, it has to have 1 lower character, 1 upper character, 1 special character, 1 digit and has to be between 6 and 20 characters.',
+        });
+
+        return { errors };
+      }
+
+      const newPassword = await bcrypt.hash(passwordInput.newPassword, 10);
+
+      console.log('newPassword', newPassword);
+
+      user = prisma.user.update({
+        where: { id: userId },
+        data: { password: newPassword },
+      });
+
+      if (!user) {
+        errors.push({
+          type: 'user',
+          message: 'Unable to update user password.',
+        });
+
+        return { errors };
       }
     } catch (error) {
       return { errors: catchUserErrors(error) };
@@ -175,17 +277,24 @@ export default class UserResolver {
     try {
       const authHeader = req.headers.authorization;
 
-      if (authHeader) {
-        const { userId } = getTokenPayload(authHeader);
+      if (!authHeader) {
+        errors.push({
+          type: 'authorization',
+          message: 'No authorization token found.',
+        });
 
-        user = await prisma.user.findUnique({ where: { id: userId } });
+        return { errors };
+      }
 
-        if (!user) {
-          errors.push({
-            type: 'session',
-            message: 'No user was found in session.',
-          });
-        }
+      const { userId } = getTokenPayload(authHeader);
+
+      user = await prisma.user.findUnique({ where: { id: userId } });
+
+      if (!user) {
+        errors.push({
+          type: 'session',
+          message: 'No user was found in session.',
+        });
       }
     } catch (error) {
       errors.push({
