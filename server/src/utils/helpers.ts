@@ -123,3 +123,12 @@ export const getAuthUser = (req: LTSession): ValidatedUser => {
 
   return { token, userId };
 };
+
+export const getTagsAndMentions = (
+  text: string
+): { hashtags: string[]; mentions: string[] } => {
+  return {
+    hashtags: text.match(/\B\#\w\w+\b/g) || [],
+    mentions: text.match(/\B\@\w\w+\b/g)?.map(m => m.replace('@', '')) || [],
+  };
+};

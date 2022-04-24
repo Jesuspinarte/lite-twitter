@@ -7,6 +7,7 @@ import Vote from './Vote';
 @ObjectType()
 export default class Tweet {
   userId: string; // Not mapped with @Field to hide this property on the response.
+  usernameMentions: string[]; // Not mapped with @Field to hide this property on the response.
 
   @Field()
   id: string;
@@ -31,12 +32,15 @@ export default class Tweet {
 
   @Field(() => [Tweet])
   comments: Tweet[];
+
+  @Field(() => [User])
+  mentions: User[];
 }
 
 @ObjectType()
 export class TweetsResponse {
   @Field(() => [ErrorMessage], { nullable: true })
-  erors?: ErrorMessage[];
+  errors?: ErrorMessage[];
 
   @Field(() => [Tweet], { nullable: true })
   tweets?: Tweet[];
