@@ -4,6 +4,9 @@ import { Field, InputType } from 'type-graphql';
 export default class TweetInput {
   @Field()
   text: string;
+
+  @Field({ nullable: true })
+  tweetId?: string;
 }
 
 @InputType()

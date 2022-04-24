@@ -59,6 +59,9 @@ export default class TweetResolver {
           hashtags,
           usernameMentions: mentions,
           user: { connect: { id: userId } },
+          ...(tweetInput.tweetId && {
+            tweet: { connect: { id: tweetInput.tweetId } },
+          }),
         },
       });
 
@@ -179,5 +182,14 @@ export default class TweetResolver {
     }
 
     return mentions;
+  }
+
+  @FieldResolver(() => [])
+  async comments(@Root() tweet: Tweet, @Ctx() { prisma }: LTContext) {
+    return (
+      (await prisma.tweet.findMany({
+        where: { tweetId: tweet.id },
+      })) || []
+    );
   }
 }
