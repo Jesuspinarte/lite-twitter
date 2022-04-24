@@ -1,10 +1,13 @@
 import { Field, ObjectType } from 'type-graphql';
+import ErrorMessage from './ErrorMessage';
 
 import User from './User';
 import Vote from './Vote';
 
 @ObjectType()
 export default class Tweet {
+  userId: string; // Not mapped with @Field to hide this property on the response.
+
   @Field()
   id: string;
 
@@ -28,4 +31,22 @@ export default class Tweet {
 
   @Field(() => [Tweet])
   comments: Tweet[];
+}
+
+@ObjectType()
+export class TweetsResponse {
+  @Field(() => [ErrorMessage], { nullable: true })
+  erors?: ErrorMessage[];
+
+  @Field(() => [Tweet], { nullable: true })
+  tweets?: Tweet[];
+}
+
+@ObjectType()
+export class TweetResponse {
+  @Field(() => [ErrorMessage], { nullable: true })
+  errors?: ErrorMessage[];
+
+  @Field(() => Tweet, { nullable: true })
+  tweet?: Tweet;
 }

@@ -39,3 +39,15 @@ export class UserResponse {
   @Field(() => User, { nullable: true })
   user: User;
 }
+
+@ObjectType()
+export class ValidatedUser {
+  @Field(() => [ErrorMessage], { nullable: true })
+  errors?: ErrorMessage[];
+
+  @Field({ nullable: true })
+  token?: string;
+
+  @Field({ nullable: true })
+  userId?: string;
+}

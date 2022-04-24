@@ -13,7 +13,7 @@ import { SECRET_KEY } from '../utils/constants';
 import { LTContext } from '../utils/types';
 import {
   catchUserErrors,
-  getTokenPayload,
+  getAuthUser,
   validatePassword,
   validateUserInput,
 } from '../utils/helpers';
@@ -26,7 +26,7 @@ export default class UserResolver {
     @Arg('user') userInput: UserInput,
     @Ctx() { prisma }: LTContext
   ) {
-    let errors: ErrorMessage[] = [...validateUserInput(userInput)];
+    const errors: ErrorMessage[] = [...validateUserInput(userInput)];
 
     if (errors.length) {
       return { errors };
@@ -52,11 +52,11 @@ export default class UserResolver {
   @Mutation(() => UserResponse)
   async login(
     @Arg('user') userInput: UserLoginInput,
-    @Ctx() { prisma, req }: LTContext
+    @Ctx() { prisma /*, req*/ }: LTContext
   ) {
+    const errors: ErrorMessage[] = [];
     let user;
     let token;
-    let errors = [];
 
     try {
       user = await prisma.user.findFirst({
@@ -101,7 +101,7 @@ export default class UserResolver {
       }
 
       token = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '7d' });
-      req.session.token = token;
+      // req.session.token = token;
     } catch (error) {
       errors.push({
         type: 'input',
@@ -119,38 +119,15 @@ export default class UserResolver {
     @Arg('user') userInfo: UserInfo,
     @Ctx() { prisma, req }: LTContext
   ) {
-    let errors: ErrorMessage[] = [];
-    if (!req) {
-      errors.push({
-        type: 'authorization',
-        message: 'No authenticated user found.',
-      });
-
-      return { errors };
-    }
-
-    errors.push(...validateUserInput(userInfo));
+    const { userId, errors: newErrors } = getAuthUser(req);
+    const errors: ErrorMessage[] = [...(newErrors || [])];
+    let user;
 
     if (errors.length) {
       return { errors };
     }
 
-    let user;
-
     try {
-      const authHeader = req.headers.authorization;
-
-      if (!authHeader) {
-        errors.push({
-          type: 'authorization',
-          message: 'No authorization token found.',
-        });
-
-        return { errors };
-      }
-
-      const { userId } = getTokenPayload(authHeader);
-
       user = await prisma.user.update({
         where: { id: userId },
         data: { ...userInfo },
@@ -176,32 +153,15 @@ export default class UserResolver {
     @Arg('password') passwordInput: PasswordInput,
     @Ctx() { prisma, req }: LTContext
   ) {
-    let errors: ErrorMessage[] = [];
+    const { userId, errors: newErrors } = getAuthUser(req);
+    const errors: ErrorMessage[] = [...(newErrors || [])];
     let user;
 
-    if (!req) {
-      errors.push({
-        type: 'authorization',
-        message: 'No authenticated user found.',
-      });
-
+    if (errors.length) {
       return { errors };
     }
 
     try {
-      const authHeader = req.headers.authorization;
-
-      if (!authHeader) {
-        errors.push({
-          type: 'authorization',
-          message: 'No authorization token found.',
-        });
-
-        return { errors };
-      }
-
-      const { userId } = getTokenPayload(authHeader);
-
       user = await prisma.user.findUnique({
         where: { id: userId },
       });
@@ -227,7 +187,6 @@ export default class UserResolver {
       }
 
       if (!validatePassword(passwordInput.newPassword)) {
-        console.log('hola');
         errors.push({
           field: 'newPassword',
           message:
@@ -238,8 +197,6 @@ export default class UserResolver {
       }
 
       const newPassword = await bcrypt.hash(passwordInput.newPassword, 10);
-
-      console.log('newPassword', newPassword);
 
       user = prisma.user.update({
         where: { id: userId },
@@ -263,10 +220,12 @@ export default class UserResolver {
 
   @Query(() => UserResponse)
   async currentUser(@Ctx() { prisma, req }: LTContext) {
+    const { userId, errors: newErrors } = getAuthUser(req);
+    const errors: ErrorMessage[] = [...(newErrors || [])];
     let user;
-    let errors = [];
-
-    console.log(req.session.token);
+    if (errors.length) {
+      return { errors };
+    }
 
     if (!req) {
       errors.push({
@@ -278,19 +237,6 @@ export default class UserResolver {
     }
 
     try {
-      const authHeader = req.headers.authorization;
-
-      if (!authHeader) {
-        errors.push({
-          type: 'authorization',
-          message: 'No authorization token found.',
-        });
-
-        return { errors };
-      }
-
-      const { userId } = getTokenPayload(authHeader);
-
       user = await prisma.user.findUnique({ where: { id: userId } });
 
       if (!user) {
@@ -298,6 +244,7 @@ export default class UserResolver {
           type: 'session',
           message: 'No user was found in session.',
         });
+        return { errors };
       }
     } catch (error) {
       errors.push({

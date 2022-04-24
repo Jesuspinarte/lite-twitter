@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
+import { ValidatedUser } from 'src/entities/User';
 import ErrorMessage from '../entities/ErrorMessage';
 import UserInput, { UserInfo } from '../inputs/UserInput';
 import { SECRET_KEY } from './constants';
-import { UserTokenData } from './types';
+import { LTSession, UserTokenData } from './types';
 
 export const getTokenPayload = (token: string): UserTokenData => {
   const userData = jwt.verify(token.replace('Bearer ', ''), SECRET_KEY);
@@ -83,4 +84,42 @@ export const catchUserErrors = (error: any): ErrorMessage[] => {
   }
 
   return errors;
+};
+
+export const getAuthUser = (req: LTSession): ValidatedUser => {
+  const errors: ErrorMessage[] = [];
+  let userId;
+  let token;
+
+  if (!req) {
+    errors.push({
+      type: 'authorization',
+      message: 'No authenticated user found.',
+    });
+
+    return { errors };
+  }
+
+  if (errors.length) {
+    return { errors };
+  }
+
+  try {
+    token = req.headers.authorization;
+
+    if (!token) {
+      errors.push({
+        type: 'authorization',
+        message: 'No authorization token found.',
+      });
+
+      return { errors };
+    }
+
+    userId = getTokenPayload(token).userId;
+  } catch (error) {
+    return { errors: catchUserErrors(error) };
+  }
+
+  return { token, userId };
 };
