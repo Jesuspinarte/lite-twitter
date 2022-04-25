@@ -28,9 +28,9 @@ model Tweet {
 model Vote {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
-  Tweet     Tweet    @relation(fields: [tweetId], references: [id])
+  tweet     Tweet    @relation(fields: [tweetId], references: [id])
   tweetId   String   @db.ObjectId
-  User      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   userId    String   @db.ObjectId
 
   @@unique([tweetId, userId])

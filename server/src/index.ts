@@ -9,6 +9,7 @@ import { buildSchema } from 'type-graphql';
 import UserResolver from './resolvers/user';
 import { SECRET_KEY } from './utils/constants';
 import TweetResolver from './resolvers/tweet';
+import VoteResolver from './resolvers/vote';
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,7 @@ async function main() {
   console.log('Creating server...');
   const server = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [TweetResolver, UserResolver],
+      resolvers: [TweetResolver, UserResolver, VoteResolver],
       validate: false,
     }),
     context: async ({ req, res }) => ({

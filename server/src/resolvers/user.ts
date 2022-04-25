@@ -1,4 +1,12 @@
-import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import {
+  Arg,
+  Ctx,
+  FieldResolver,
+  Mutation,
+  Query,
+  Resolver,
+  Root,
+} from 'type-graphql';
 
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -256,5 +264,15 @@ export default class UserResolver {
     }
 
     return { user };
+  }
+
+  @FieldResolver(() => [])
+  async tweets(@Root() user: User, @Ctx() { prisma }: LTContext) {
+    return (await prisma.tweet.findMany({ where: { userId: user.id } })) || [];
+  }
+
+  @FieldResolver(() => [])
+  async votes(@Root() user: User, @Ctx() { prisma }: LTContext) {
+    return (await prisma.vote.findMany({ where: { userId: user.id } })) || [];
   }
 }
