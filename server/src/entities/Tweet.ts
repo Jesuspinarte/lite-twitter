@@ -35,6 +35,12 @@ export default class Tweet {
 
   @Field(() => [User])
   mentions: User[];
+
+  @Field()
+  votesCount: number;
+
+  @Field()
+  commentsCount: number;
 }
 
 @ObjectType()

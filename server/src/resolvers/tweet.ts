@@ -192,4 +192,31 @@ export default class TweetResolver {
       })) || []
     );
   }
+
+  @FieldResolver(() => [])
+  async commentsCount(@Root() tweet: Tweet, @Ctx() { prisma }: LTContext) {
+    return (
+      (await prisma.tweet.count({
+        where: { tweetId: tweet.id },
+      })) || 0
+    );
+  }
+
+  @FieldResolver(() => [])
+  async votes(@Root() tweet: Tweet, @Ctx() { prisma }: LTContext) {
+    return (
+      (await prisma.vote.findMany({
+        where: { tweetId: tweet.id },
+      })) || []
+    );
+  }
+
+  @FieldResolver(() => [])
+  async votesCount(@Root() tweet: Tweet, @Ctx() { prisma }: LTContext) {
+    return (
+      (await prisma.vote.count({
+        where: { tweetId: tweet.id },
+      })) || 0
+    );
+  }
 }
