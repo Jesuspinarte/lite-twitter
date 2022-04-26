@@ -1,0 +1,26 @@
+query Feed($params: TweetParams!) {
+  feed(params: $params) {
+    errors {
+      field
+      message
+      type
+    }
+    tweets {
+      id
+      text
+      user {
+        id
+        name
+        username
+      }
+      votesCount
+      commentsCount
+      hashtags
+      mentions {
+        id
+        username
+        name
+      }
+    }
+  }
+}

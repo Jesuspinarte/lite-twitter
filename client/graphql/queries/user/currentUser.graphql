@@ -1,0 +1,16 @@
+query CurrentUser{
+  currentUser {
+    errors {
+      field
+      type
+      message
+    }
+    user {
+      id
+      email
+      name
+      username
+      createdAt
+    }
+  }
+}

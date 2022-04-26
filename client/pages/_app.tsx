@@ -1,15 +1,12 @@
-import App, { AppContext } from 'next/app';
+import { AppContext } from 'next/app';
 import type { AppProps } from 'next/app';
-import {
-  ApolloClient,
-  ApolloProvider,
-  createHttpLink,
-  InMemoryCache,
-} from '@apollo/client';
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 
-import Chakra from '../HOC/Chakra';
+import Chakra from '../providers/Chakra';
 import Nav from '../components/Nav';
-import { httpLink } from '../utils/CreateClient';
+import CreateClient, { httpLink } from '../utils/CreateClient';
+import { CurrentUserDocument } from '../graphql/generated/graphql';
+import UserProvider from '../providers/UserProvider';
 
 export const client = new ApolloClient({
   credentials: 'include',
@@ -18,20 +15,38 @@ export const client = new ApolloClient({
 });
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
+  const { user, cookies, ...props } = pageProps;
+
   return (
     <ApolloProvider client={client}>
-      <Chakra cookies={pageProps.cookies}>
-        <Nav />
-        <Component {...pageProps} />
+      <Chakra cookies={cookies}>
+        <UserProvider user={user}>
+          <Nav />
+          <Component {...props} />
+        </UserProvider>
       </Chakra>
     </ApolloProvider>
   );
 };
 
-MyApp.getInitialProps = ({ ctx: { req } }: AppContext) => {
+MyApp.getInitialProps = async ({ ctx: { req } }: AppContext) => {
+  const client = CreateClient(req?.headers.cookie);
+  const pageProps = {
+    cookies: req?.headers.cookie ?? 'chakra-ui-color-mode=dark',
+  };
+
+  const {
+    data: {
+      currentUser: { user },
+    },
+  } = await client.query({
+    query: CurrentUserDocument,
+  });
+
   return {
     pageProps: {
-      cookies: req?.headers.cookie ?? 'chakra-ui-color-mode=dark',
+      ...pageProps,
+      user,
     },
   };
 };

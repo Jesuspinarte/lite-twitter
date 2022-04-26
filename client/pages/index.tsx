@@ -1,16 +1,16 @@
-import type { NextPage, NextPageContext } from 'next';
-import { gql } from '@apollo/client';
-
 import Head from 'next/head';
+import type { NextPage, NextPageContext } from 'next';
 import { Box, Container, Heading } from '@chakra-ui/react';
+
 import CreateClient from '../utils/CreateClient';
+import { FeedDocument } from '../graphql/generated/graphql';
 
 interface FeedProps {
   feed: any;
 }
 
 const Home: NextPage<FeedProps> = ({ feed }) => {
-  console.log(feed);
+  console.table(feed?.tweets);
 
   return (
     <Box as="main">
@@ -30,44 +30,16 @@ const Home: NextPage<FeedProps> = ({ feed }) => {
 };
 
 export async function getServerSideProps(context: NextPageContext) {
-  const client = CreateClient(context);
+  const client = CreateClient(context?.req?.headers.cookie);
 
   const { data } = await client.query({
-    query: gql`
-      query {
-        feed {
-          errors {
-            field
-            message
-            type
-          }
-          tweets {
-            id
-            text
-            user {
-              username
-              id
-            }
-            hashtags
-            mentions {
-              id
-              username
-              name
-              email
-              createdAt
-            }
-            comments {
-              text
-              hashtags
-              text
-              mentions {
-                username
-              }
-            }
-          }
-        }
-      }
-    `,
+    query: FeedDocument,
+    variables: {
+      params: {
+        page: 1,
+        perPage: 2,
+      },
+    },
   });
 
   return {

@@ -7,15 +7,14 @@ export const httpLink = createHttpLink({
   credentials: 'include',
 });
 
-const CreateClient = (ctx: NextPageContext | null) => {
+const CreateClient = (cookie?: string | null) => {
   const authLink = setContext((_, { headers }) => {
     return {
       headers: {
         ...headers,
         cookie:
-          (typeof window === 'undefined'
-            ? ctx?.req?.headers.cookie || undefined
-            : undefined) || '',
+          (typeof window === 'undefined' ? cookie || undefined : undefined) ||
+          '',
       },
     };
   });

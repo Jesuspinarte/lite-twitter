@@ -163,7 +163,11 @@ export default class TweetResolver {
     const perPage = params?.perPage || 10;
     const skip = page * perPage;
 
-    const tweets = await prisma.tweet.findMany({ skip, take: perPage });
+    const tweets = await prisma.tweet.findMany({
+      skip,
+      take: perPage,
+      orderBy: { createdAt: 'desc' },
+    });
 
     return { tweets };
   }

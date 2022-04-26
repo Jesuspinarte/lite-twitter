@@ -44,10 +44,13 @@ async function main() {
 
   app.use(
     session({
+      name: 'lt_session',
       store,
       secret: SECRET_KEY,
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+        // maxAge: 1000 * 60, // 1 minute
+        // maxAge: 1000 * 30, // 30 seconds
         httpOnly: true,
       },
       resave: false,
