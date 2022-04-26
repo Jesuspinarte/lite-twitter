@@ -1,11 +1,15 @@
-import type { NextPage } from "next";
-import { gql } from "@apollo/client";
-import client from "../apollo-client";
+import type { NextPage, NextPageContext } from 'next';
+import { gql } from '@apollo/client';
 
-import Head from "next/head";
-import { Box, Container, Heading } from "@chakra-ui/react";
+import Head from 'next/head';
+import { Box, Container, Heading } from '@chakra-ui/react';
+import CreateClient from '../utils/CreateClient';
 
-const Home: NextPage<any> = ({ feed }) => {
+interface FeedProps {
+  feed: any;
+}
+
+const Home: NextPage<FeedProps> = ({ feed }) => {
   console.log(feed);
 
   return (
@@ -25,7 +29,9 @@ const Home: NextPage<any> = ({ feed }) => {
   );
 };
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context: NextPageContext) {
+  const client = CreateClient(context);
+
   const { data } = await client.query({
     query: gql`
       query {
@@ -66,7 +72,7 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      feed: data,
+      feed: data.feed,
     },
   };
 }
