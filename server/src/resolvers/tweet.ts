@@ -150,9 +150,15 @@ export default class TweetResolver {
 
   @Query(() => TweetsResponse)
   async feed(
-    @Ctx() { prisma }: LTContext,
+    @Ctx() { prisma, req }: LTContext,
     @Arg('params', { nullable: true }) params?: TweetParams
   ) {
+    const { errors: newErrors } = getAuthUser(req);
+    const errors: ErrorMessage[] = [...(newErrors || [])];
+    if (errors.length) {
+      return { errors };
+    }
+
     const page = params?.page ? params.page - 1 : 0;
     const perPage = params?.perPage || 10;
     const skip = page * perPage;

@@ -105,7 +105,7 @@ export const getAuthUser = (req: LTSession): ValidatedUser => {
   }
 
   try {
-    token = req.headers.authorization;
+    token = req.session.token || req.headers.authorization;
 
     if (!token) {
       errors.push({
