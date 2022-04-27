@@ -1,12 +1,13 @@
 import {
   Box,
   IconButton,
+  Link,
   ListItem,
   UnorderedList,
   useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { useLogoutMutation } from '../graphql/generated/graphql';
 import { useRouter } from 'next/router';
@@ -15,7 +16,7 @@ import { useUserContext } from '../providers/UserProvider';
 const Nav: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const modeBgColor = useColorModeValue('blackAlpha.300', 'whiteAlpha.300');
-  const { setUser } = useUserContext();
+  const { user, setUser } = useUserContext();
 
   const router = useRouter();
   const [logOut] = useLogoutMutation({
@@ -36,33 +37,35 @@ const Nav: React.FC = () => {
       width="100%"
       backgroundColor="transparent"
     >
-      <UnorderedList>
-        <ListItem>
-          <Link href="/">
-            <a>Home</a>
-          </Link>
-        </ListItem>
-        <ListItem>
-          <Link href="/login">
-            <a>login</a>
-          </Link>
-        </ListItem>
-        <ListItem>
-          <Link href="/profile">
-            <a>Profile</a>
-          </Link>
-        </ListItem>
-        <ListItem>
-          <Link href="/register">
-            <a>Register</a>
-          </Link>
-        </ListItem>
-        <ListItem>
-          <a onClick={handleLogOut} style={{ cursor: 'pointer' }}>
-            Log Out
-          </a>
-        </ListItem>
-      </UnorderedList>
+      {user && router.pathname !== '/login' && router.pathname !== '/register' && (
+        <UnorderedList>
+          <ListItem>
+            <NextLink href="/" passHref>
+              <Link>Home</Link>
+            </NextLink>
+          </ListItem>
+          <ListItem>
+            <NextLink href="/login" passHref>
+              <Link>login</Link>
+            </NextLink>
+          </ListItem>
+          <ListItem>
+            <NextLink href="/profile" passHref>
+              <Link>Profile</Link>
+            </NextLink>
+          </ListItem>
+          <ListItem>
+            <NextLink href="/register" passHref>
+              <Link>Register</Link>
+            </NextLink>
+          </ListItem>
+          <ListItem>
+            <a onClick={handleLogOut} style={{ cursor: 'pointer' }}>
+              Log Out
+            </a>
+          </ListItem>
+        </UnorderedList>
+      )}
       <Box m={2} position="absolute" right={0} top={0} outline="none">
         <IconButton
           icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}

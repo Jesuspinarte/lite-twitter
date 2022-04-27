@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import { useRouter } from 'next/router';
+import NextLink from 'next/link';
 import {
   Badge,
   Box,
@@ -13,6 +14,7 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Link,
   List,
   ListIcon,
   ListItem,
@@ -55,6 +57,7 @@ export const SignForm: React.FC<SignFormProps> = ({ signIn = true }) => {
   const errorColor = 'red.300';
   const submitBgColor = useColorModeValue('gray.800', 'teal.200');
   const submitTextColor = useColorModeValue('whiteAlpha.900', 'gray.800');
+  const linkColor = useColorModeValue('orange.600', 'orange.200');
   const autoFillStyles = {
     textFillColor: '#c6c6c6',
     transition: 'background-color 5000s ease-in-out 0s',
@@ -260,7 +263,13 @@ export const SignForm: React.FC<SignFormProps> = ({ signIn = true }) => {
   };
 
   return (
-    <Flex as="form" flexFlow="row wrap" p={14} onSubmit={handleSubmit}>
+    <Flex
+      as="form"
+      flexFlow="row wrap"
+      p={14}
+      onSubmit={handleSubmit}
+      maxW={615}
+    >
       {!signIn && (
         <>
           <FormControl mb={4}>
@@ -502,15 +511,33 @@ export const SignForm: React.FC<SignFormProps> = ({ signIn = true }) => {
           )}
         </FormControl>
       )}
-      <Button
-        width="100%"
-        type="submit"
-        backgroundColor={submitBgColor}
-        color={submitTextColor}
-        disabled={!canSubmit || disableForm}
-      >
-        {signIn ? 'Log In' : 'Register'}
-      </Button>
+      <Box>
+        <Button
+          // width="100%"
+          type="submit"
+          backgroundColor={submitBgColor}
+          color={submitTextColor}
+          disabled={!canSubmit || disableForm}
+          mr={6}
+          pr={10}
+          pl={10}
+        >
+          {signIn ? 'Log In' : 'Register'}
+        </Button>
+        {signIn ? (
+          <NextLink href="/register" passHref>
+            <Link mt={6} mb={10} color={linkColor}>
+              I don&apos;t have an account
+            </Link>
+          </NextLink>
+        ) : (
+          <NextLink href="/login" passHref>
+            <Link mt={6} mb={10} color={linkColor}>
+              I have an account
+            </Link>
+          </NextLink>
+        )}
+      </Box>
     </Flex>
   );
 };
