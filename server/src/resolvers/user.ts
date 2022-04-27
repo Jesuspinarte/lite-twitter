@@ -17,7 +17,7 @@ import UserInput, {
   UserInfo,
   UserLoginInput,
 } from '../inputs/UserInput';
-import { SECRET_KEY } from '../utils/constants';
+import { COOKIE_NAME, SECRET_KEY } from '../utils/constants';
 import { LTContext } from '../utils/types';
 import {
   catchUserErrors,
@@ -32,7 +32,7 @@ export default class UserResolver {
   @Mutation(() => UserResponse)
   async register(
     @Arg('user') userInput: UserInput,
-    @Ctx() { prisma }: LTContext
+    @Ctx() { prisma, req }: LTContext
   ) {
     const errors: ErrorMessage[] = [...validateUserInput(userInput)];
 
@@ -50,6 +50,7 @@ export default class UserResolver {
       });
 
       token = jwt.sign({ userId: newUser.id }, SECRET_KEY, { expiresIn: '7d' });
+      req.session.token = token;
     } catch (error) {
       return { errors: catchUserErrors(error) };
     }
@@ -120,6 +121,22 @@ export default class UserResolver {
     }
 
     return { token, user };
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: LTContext) {
+    return new Promise(resolve =>
+      req.session.destroy(err => {
+        res.clearCookie(COOKIE_NAME);
+        if (err) {
+          console.log(err);
+          resolve(false);
+          return;
+        }
+
+        resolve(true);
+      })
+    );
   }
 
   @Mutation(() => UserResponse)

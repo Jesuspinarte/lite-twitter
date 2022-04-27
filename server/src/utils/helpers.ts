@@ -27,7 +27,7 @@ export const validatePassword = (password: string): boolean =>
   !!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(\W|_)).{6,20}$/);
 
 /**
- * Can han lowercase characters, uppercase characters, digits, ".", "-", "_" characters amd between 6 and 16 characters
+ * Can have lowercase characters, uppercase characters, digits, ".", "-", "_" characters and between 6 and 16 characters
  */
 export const validateUsername = (username: string): boolean =>
   !!username.match(/^[a-z0-9A-Z\._-]{6,16}$/);

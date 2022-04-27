@@ -8,10 +8,24 @@ import {
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { useLogoutMutation } from '../graphql/generated/graphql';
+import { useRouter } from 'next/router';
+import { useUserContext } from '../providers/UserProvider';
 
 const Nav: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const modeBgColor = useColorModeValue('blackAlpha.300', 'whiteAlpha.300');
+  const { setUser } = useUserContext();
+
+  const router = useRouter();
+  const [logOut] = useLogoutMutation({
+    onCompleted: () => router.push('/login'),
+  });
+
+  const handleLogOut = async () => {
+    setUser(null);
+    await logOut();
+  };
 
   return (
     <Box
@@ -37,6 +51,16 @@ const Nav: React.FC = () => {
           <Link href="/profile">
             <a>Profile</a>
           </Link>
+        </ListItem>
+        <ListItem>
+          <Link href="/register">
+            <a>Register</a>
+          </Link>
+        </ListItem>
+        <ListItem>
+          <a onClick={handleLogOut} style={{ cursor: 'pointer' }}>
+            Log Out
+          </a>
         </ListItem>
       </UnorderedList>
       <Box m={2} position="absolute" right={0} top={0} outline="none">

@@ -4,13 +4,13 @@ import { Box, Flex, useColorModeValue } from '@chakra-ui/react';
 
 import { SignForm } from '../components/SignForm';
 
-const Login: NextPage = () => {
+const Register: NextPage = () => {
   const infoBgColor = useColorModeValue('teal.300', 'teal.200');
 
   return (
     <Box as="main">
       <Head>
-        <title>Lite Twiiter | Sign In</title>
+        <title>Lite Twiiter | Register</title>
         <meta
           name="description"
           content="Lite Twitter with GraphQL and Nextjs"
@@ -26,11 +26,11 @@ const Login: NextPage = () => {
           alignItems="center"
           boxShadow="-1px 0 20px 1px #111"
         >
-          <SignForm />
+          <SignForm signIn={false} />
         </Flex>
       </Flex>
     </Box>
   );
 };
 
-export default Login;
+export default Register;

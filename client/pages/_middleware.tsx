@@ -6,11 +6,18 @@ export async function middleware(req: NextRequest, ev: NextFetchEvent) {
   const url = req.nextUrl.clone();
   const isUserInSession = !!req.cookies.lt_session;
 
-  if (url.pathname === '/login' && isUserInSession) {
+  if (
+    (url.pathname === '/login' || url.pathname === '/register') &&
+    isUserInSession
+  ) {
     return NextResponse.redirect(new URL('/', url));
   }
 
-  if (url.pathname !== '/login' && !isUserInSession) {
+  if (
+    url.pathname !== '/login' &&
+    url.pathname !== '/register' &&
+    !isUserInSession
+  ) {
     return NextResponse.redirect(new URL('/login', url));
   }
 

@@ -9,7 +9,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 
 import UserResolver from './resolvers/user';
-import { SECRET_KEY } from './utils/constants';
+import { COOKIE_NAME, SECRET_KEY } from './utils/constants';
 import TweetResolver from './resolvers/tweet';
 import VoteResolver from './resolvers/vote';
 
@@ -44,7 +44,7 @@ async function main() {
 
   app.use(
     session({
-      name: 'lt_session',
+      name: COOKIE_NAME,
       store,
       secret: SECRET_KEY,
       cookie: {
