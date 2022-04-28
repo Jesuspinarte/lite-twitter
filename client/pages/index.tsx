@@ -10,7 +10,7 @@ interface FeedProps {
 }
 
 const Home: NextPage<FeedProps> = ({ feed }) => {
-  console.table(feed?.tweets);
+  // console.table(feed?.tweets);
 
   return (
     <Box as="main">

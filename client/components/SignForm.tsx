@@ -34,6 +34,7 @@ import {
 } from '../graphql/generated/graphql';
 import { useUserContext } from '../providers/UserProvider';
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons';
+import { motion } from 'framer-motion';
 
 type SignFormProps = PropsWithChildren<{ signIn?: boolean }>;
 
@@ -191,7 +192,7 @@ export const SignForm: React.FC<SignFormProps> = ({ signIn = true }) => {
         username: username.current?.value || '',
         password: password.current?.value || '',
         email: email.current?.value || '',
-        name: password.current?.value || '',
+        name: name.current?.value || '',
       },
     },
     onCompleted: ({ register: { errors: loginErrors, user } }) => {
@@ -269,228 +270,222 @@ export const SignForm: React.FC<SignFormProps> = ({ signIn = true }) => {
       p={14}
       onSubmit={handleSubmit}
       maxW={615}
+      width="100%"
     >
-      {!signIn && (
-        <>
-          <FormControl mb={4}>
-            <FormLabel htmlFor="email">Email</FormLabel>
-            <Input
-              isInvalid={!!errors.email}
-              id="email"
-              name="email"
-              type="email"
-              variant="flushed"
-              p={4}
-              ref={email}
-              _autofill={autoFillStyles}
-              onChange={removeErrorsOnChange}
-              disabled={disableForm}
-              required
-            />
-            {!!errors.email && (
-              <FormHelperText color={errorColor}>{errors.email}</FormHelperText>
-            )}
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel htmlFor="name">Name</FormLabel>
-            <Input
-              isInvalid={!!errors.name}
-              id="name"
-              name="name"
-              type="text"
-              variant="flushed"
-              p={4}
-              ref={name}
-              _autofill={autoFillStyles}
-              onChange={removeErrorsOnChange}
-              disabled={disableForm}
-              required
-            />
-            {!!errors.name && (
-              <FormHelperText color={errorColor}>{errors.name}</FormHelperText>
-            )}
-          </FormControl>
-        </>
-      )}
-      <FormControl mb={4}>
-        <FormLabel htmlFor="username">
-          Username
-          {!signIn && (
-            <Popover placement="right" closeOnBlur isOpen={showUsernameHelper}>
-              <PopoverTrigger>
-                <Badge
-                  colorScheme={isUsernameValid ? 'green' : 'red'}
-                  ml="1"
-                  p={0.5}
-                  pl={1.5}
-                  pr={1.5}
-                  fontSize="0.6em"
-                  as="a"
-                  cursor="pointer"
-                  onMouseEnter={() => setShowUsernameHelper(true)}
-                  onMouseLeave={() => setShowUsernameHelper(false)}
-                >
-                  {isUsernameValid ? 'Valid' : 'Not valid'}
-                </Badge>
-              </PopoverTrigger>
-              <PopoverContent _focus={{ outline: 'none' }}>
-                <PopoverArrow />
-                <PopoverCloseButton _focus={{ outline: 'none' }} />
-                <PopoverBody fontSize={13}>
-                  Username can only have lowercase characters, uppercase
-                  characters, digits, &quot;.&quot;, &quot;-&quot;,
-                  &quot;_&quot; characters and between 6 - 16 characters
-                </PopoverBody>
-              </PopoverContent>
-            </Popover>
-          )}
-        </FormLabel>
-
-        <Input
-          isInvalid={!!errors.username}
-          id="username"
-          name="username"
-          type="text"
-          variant="flushed"
-          p={4}
-          ref={username}
-          _autofill={autoFillStyles}
-          onChange={removeErrorsOnChange}
-          disabled={disableForm}
-          required
-        />
-        {!!errors.username ? (
-          <FormHelperText color={errorColor}>{errors.username}</FormHelperText>
-        ) : (
-          <FormHelperText>Username is not case sensitive.</FormHelperText>
+      <Box
+        as={motion.div}
+        initial={{ y: 200, opacity: 0, scale: 1 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        width="100%"
+      >
+        {!signIn && (
+          <>
+            <FormControl mb={4}>
+              <FormLabel htmlFor="email">Email</FormLabel>
+              <Input
+                isInvalid={!!errors.email}
+                id="email"
+                name="email"
+                type="email"
+                variant="flushed"
+                p={4}
+                ref={email}
+                _autofill={autoFillStyles}
+                onChange={removeErrorsOnChange}
+                disabled={disableForm}
+                required
+              />
+              {!!errors.email && (
+                <FormHelperText color={errorColor}>
+                  {errors.email}
+                </FormHelperText>
+              )}
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel htmlFor="name">Name</FormLabel>
+              <Input
+                isInvalid={!!errors.name}
+                id="name"
+                name="name"
+                type="text"
+                variant="flushed"
+                p={4}
+                ref={name}
+                _autofill={autoFillStyles}
+                onChange={removeErrorsOnChange}
+                disabled={disableForm}
+                required
+              />
+              {!!errors.name && (
+                <FormHelperText color={errorColor}>
+                  {errors.name}
+                </FormHelperText>
+              )}
+            </FormControl>
+          </>
         )}
-      </FormControl>
-      <FormControl mb={4}>
-        <FormLabel htmlFor="password">
-          Password{' '}
-          {!signIn && (
-            <Popover placement="right" closeOnBlur isOpen={showPasswordHelper}>
-              <PopoverTrigger>
-                <Badge
-                  colorScheme={isPasswordValid ? 'green' : 'red'}
-                  ml="1"
-                  p={0.5}
-                  pl={1.5}
-                  pr={1.5}
-                  fontSize="0.6em"
-                  as="a"
-                  cursor="pointer"
-                  onMouseEnter={() => setShowPasswordHelper(true)}
-                  onMouseLeave={() => setShowPasswordHelper(false)}
-                >
-                  {isPasswordValid ? 'Valid' : 'Not valid'}
-                </Badge>
-              </PopoverTrigger>
-              <PopoverContent _focus={{ outline: 'none' }}>
-                <PopoverHeader
-                  pt={4}
-                  fontWeight="bold"
-                  border="0"
-                  fontSize={14}
-                >
-                  Password must contain the following:
-                </PopoverHeader>
-                <PopoverArrow />
-                <PopoverCloseButton _focus={{ outline: 'none' }} />
-                <PopoverBody fontSize={13}>
-                  <List>
-                    <ListItem>
-                      <ListIcon
-                        as={uppercaseMatch ? CheckCircleIcon : WarningIcon}
-                        color={uppercaseMatch ? 'green.500' : 'red.500'}
-                      />{' '}
-                      A capital (uppercase) letter
-                    </ListItem>
-                    <ListItem>
-                      <ListIcon
-                        as={lowercaseMatch ? CheckCircleIcon : WarningIcon}
-                        color={lowercaseMatch ? 'green.500' : 'red.500'}
-                      />{' '}
-                      A lowercase letter
-                    </ListItem>
-                    <ListItem>
-                      <ListIcon
-                        as={digitMatch ? CheckCircleIcon : WarningIcon}
-                        color={digitMatch ? 'green.500' : 'red.500'}
-                      />{' '}
-                      A number
-                    </ListItem>
-                    <ListItem>
-                      <ListIcon
-                        as={
-                          specialCharacterMatch ? CheckCircleIcon : WarningIcon
-                        }
-                        color={specialCharacterMatch ? 'green.500' : 'red.500'}
-                      />{' '}
-                      At least one special character
-                    </ListItem>
-                    <ListItem>
-                      <ListIcon
-                        as={lengthMatch ? CheckCircleIcon : WarningIcon}
-                        color={lengthMatch ? 'green.500' : 'red.500'}
-                      />{' '}
-                      From 6 to 20 characters
-                    </ListItem>
-                  </List>
-                </PopoverBody>
-              </PopoverContent>
-            </Popover>
-          )}
-        </FormLabel>
-        <InputGroup size="md">
+        <FormControl mb={4}>
+          <FormLabel htmlFor="username">
+            Username
+            {!signIn && (
+              <Popover
+                placement="right"
+                closeOnBlur
+                isOpen={showUsernameHelper}
+              >
+                <PopoverTrigger>
+                  <Badge
+                    colorScheme={isUsernameValid ? 'green' : 'red'}
+                    ml="1"
+                    p={0.5}
+                    pl={1.5}
+                    pr={1.5}
+                    fontSize="0.6em"
+                    as="a"
+                    cursor="pointer"
+                    onMouseEnter={() => setShowUsernameHelper(true)}
+                    onMouseLeave={() => setShowUsernameHelper(false)}
+                  >
+                    {isUsernameValid ? 'Valid' : 'Not valid'}
+                  </Badge>
+                </PopoverTrigger>
+                <PopoverContent _focus={{ outline: 'none' }}>
+                  <PopoverArrow />
+                  <PopoverCloseButton _focus={{ outline: 'none' }} />
+                  <PopoverBody fontSize={13}>
+                    Username can only have lowercase characters, uppercase
+                    characters, digits, &quot;.&quot;, &quot;-&quot;,
+                    &quot;_&quot; characters and between 6 - 16 characters
+                  </PopoverBody>
+                </PopoverContent>
+              </Popover>
+            )}
+          </FormLabel>
+
           <Input
-            isInvalid={!!errors.password}
-            id="password"
-            name="password"
-            type={showPassword ? 'text' : 'password'}
+            isInvalid={!!errors.username}
+            id="username"
+            name="username"
+            type="text"
             variant="flushed"
             p={4}
-            ref={password}
+            ref={username}
             _autofill={autoFillStyles}
-            onChange={
-              signIn
-                ? removeErrorsOnChange
-                : e => {
-                    validateConfirmPassword(confirmPassword.current?.value);
-                    removeErrorsOnChange(e);
-                  }
-            }
+            onChange={removeErrorsOnChange}
             disabled={disableForm}
             required
           />
-          <InputRightElement width="4.5rem">
-            <Button
-              h="1.75rem"
-              size="sm"
-              onClick={() => setShowPassword(prevState => !prevState)}
-            >
-              {showPassword ? 'Hide' : 'Show'}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
-        {!!errors.password && (
-          <FormHelperText color={errorColor}>{errors.password}</FormHelperText>
-        )}
-      </FormControl>
-      {!signIn && (
+          {!!errors.username ? (
+            <FormHelperText color={errorColor}>
+              {errors.username}
+            </FormHelperText>
+          ) : (
+            <FormHelperText>Username is not case sensitive.</FormHelperText>
+          )}
+        </FormControl>
         <FormControl mb={4}>
-          <FormLabel htmlFor="confirm-password">Confirm password</FormLabel>
+          <FormLabel htmlFor="password">
+            Password{' '}
+            {!signIn && (
+              <Popover
+                placement="right"
+                closeOnBlur
+                isOpen={showPasswordHelper}
+              >
+                <PopoverTrigger>
+                  <Badge
+                    colorScheme={isPasswordValid ? 'green' : 'red'}
+                    ml="1"
+                    p={0.5}
+                    pl={1.5}
+                    pr={1.5}
+                    fontSize="0.6em"
+                    as="a"
+                    cursor="pointer"
+                    onMouseEnter={() => setShowPasswordHelper(true)}
+                    onMouseLeave={() => setShowPasswordHelper(false)}
+                  >
+                    {isPasswordValid ? 'Valid' : 'Not valid'}
+                  </Badge>
+                </PopoverTrigger>
+                <PopoverContent _focus={{ outline: 'none' }}>
+                  <PopoverHeader
+                    pt={4}
+                    fontWeight="bold"
+                    border="0"
+                    fontSize={14}
+                  >
+                    Password must contain the following:
+                  </PopoverHeader>
+                  <PopoverArrow />
+                  <PopoverCloseButton _focus={{ outline: 'none' }} />
+                  <PopoverBody fontSize={13}>
+                    <List>
+                      <ListItem>
+                        <ListIcon
+                          as={uppercaseMatch ? CheckCircleIcon : WarningIcon}
+                          color={uppercaseMatch ? 'green.500' : 'red.500'}
+                        />{' '}
+                        A capital (uppercase) letter
+                      </ListItem>
+                      <ListItem>
+                        <ListIcon
+                          as={lowercaseMatch ? CheckCircleIcon : WarningIcon}
+                          color={lowercaseMatch ? 'green.500' : 'red.500'}
+                        />{' '}
+                        A lowercase letter
+                      </ListItem>
+                      <ListItem>
+                        <ListIcon
+                          as={digitMatch ? CheckCircleIcon : WarningIcon}
+                          color={digitMatch ? 'green.500' : 'red.500'}
+                        />{' '}
+                        A number
+                      </ListItem>
+                      <ListItem>
+                        <ListIcon
+                          as={
+                            specialCharacterMatch
+                              ? CheckCircleIcon
+                              : WarningIcon
+                          }
+                          color={
+                            specialCharacterMatch ? 'green.500' : 'red.500'
+                          }
+                        />{' '}
+                        At least one special character
+                      </ListItem>
+                      <ListItem>
+                        <ListIcon
+                          as={lengthMatch ? CheckCircleIcon : WarningIcon}
+                          color={lengthMatch ? 'green.500' : 'red.500'}
+                        />{' '}
+                        From 6 to 20 characters
+                      </ListItem>
+                    </List>
+                  </PopoverBody>
+                </PopoverContent>
+              </Popover>
+            )}
+          </FormLabel>
           <InputGroup size="md">
             <Input
-              isInvalid={!!errors['confirm-password']}
-              id="confirm-password"
-              name="confirm-password"
-              type={showConfirmPassword ? 'text' : 'password'}
+              isInvalid={!!errors.password}
+              id="password"
+              name="password"
+              type={showPassword ? 'text' : 'password'}
               variant="flushed"
               p={4}
-              ref={confirmPassword}
+              ref={password}
               _autofill={autoFillStyles}
-              onChange={e => validateConfirmPassword(e.target.value)}
+              onChange={
+                signIn
+                  ? removeErrorsOnChange
+                  : e => {
+                      validateConfirmPassword(confirmPassword.current?.value);
+                      removeErrorsOnChange(e);
+                    }
+              }
               disabled={disableForm}
               required
             />
@@ -498,45 +493,81 @@ export const SignForm: React.FC<SignFormProps> = ({ signIn = true }) => {
               <Button
                 h="1.75rem"
                 size="sm"
-                onClick={() => setShowConfirmPassword(prevState => !prevState)}
+                onClick={() => setShowPassword(prevState => !prevState)}
               >
-                {showConfirmPassword ? 'Hide' : 'Show'}
+                {showPassword ? 'Hide' : 'Show'}
               </Button>
             </InputRightElement>
           </InputGroup>
-          {!!errors['confirm-password'] && (
+          {!!errors.password && (
             <FormHelperText color={errorColor}>
-              {errors['confirm-password']}
+              {errors.password}
             </FormHelperText>
           )}
         </FormControl>
-      )}
-      <Box>
-        <Button
-          // width="100%"
-          type="submit"
-          backgroundColor={submitBgColor}
-          color={submitTextColor}
-          disabled={!canSubmit || disableForm}
-          mr={6}
-          pr={10}
-          pl={10}
-        >
-          {signIn ? 'Log In' : 'Register'}
-        </Button>
-        {signIn ? (
-          <NextLink href="/register" passHref>
-            <Link mt={6} mb={10} color={linkColor}>
-              I don&apos;t have an account
-            </Link>
-          </NextLink>
-        ) : (
-          <NextLink href="/login" passHref>
-            <Link mt={6} mb={10} color={linkColor}>
-              I have an account
-            </Link>
-          </NextLink>
+        {!signIn && (
+          <FormControl mb={4}>
+            <FormLabel htmlFor="confirm-password">Confirm password</FormLabel>
+            <InputGroup size="md">
+              <Input
+                isInvalid={!!errors['confirm-password']}
+                id="confirm-password"
+                name="confirm-password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                variant="flushed"
+                p={4}
+                ref={confirmPassword}
+                _autofill={autoFillStyles}
+                onChange={e => validateConfirmPassword(e.target.value)}
+                disabled={disableForm}
+                required
+              />
+              <InputRightElement width="4.5rem">
+                <Button
+                  h="1.75rem"
+                  size="sm"
+                  onClick={() =>
+                    setShowConfirmPassword(prevState => !prevState)
+                  }
+                >
+                  {showConfirmPassword ? 'Hide' : 'Show'}
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+            {!!errors['confirm-password'] && (
+              <FormHelperText color={errorColor}>
+                {errors['confirm-password']}
+              </FormHelperText>
+            )}
+          </FormControl>
         )}
+        <Box>
+          <Button
+            // width="100%"
+            type="submit"
+            backgroundColor={submitBgColor}
+            color={submitTextColor}
+            disabled={!canSubmit || disableForm}
+            mr={6}
+            pr={10}
+            pl={10}
+          >
+            {signIn ? 'Log In' : 'Register'}
+          </Button>
+          {signIn ? (
+            <NextLink href="/register" passHref>
+              <Link mt={6} mb={10} color={linkColor}>
+                I don&apos;t have an account
+              </Link>
+            </NextLink>
+          ) : (
+            <NextLink href="/login" passHref>
+              <Link mt={6} mb={10} color={linkColor}>
+                I have an account
+              </Link>
+            </NextLink>
+          )}
+        </Box>
       </Box>
     </Flex>
   );
