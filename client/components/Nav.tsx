@@ -66,27 +66,33 @@ const Nav: React.FC = () => {
       left={0}
       width="100%"
       backgroundColor={menuBgColor}
-      height="100vh"
+      // height="calc(100vh - 2rem)"
       boxShadow={menuBoxShadowColor}
       position="relative"
+      p={4}
+      pb={14}
+      borderRadius={6}
     >
-      <WrapItem
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        flexFlow="column"
-        pt={20}
-        pb={20}
-      >
-        <Avatar name={user?.name} size="xl" mb={4} />
-        <Text fontSize={20} fontWeight="700" colorScheme="gray">
-          {user?.name}
-        </Text>
-        <Text fontSize={16} colorScheme="gray">
-          @{user?.username}
-        </Text>
-      </WrapItem>
       <List>
+        <WrapItem
+          display="flex"
+          alignItems="center"
+          justifyContent="flex-start"
+          flexFlow="row"
+          pt={12}
+          pb={12}
+          mb={4}
+        >
+          <Avatar name={user?.name} size="lg" mr={4} />
+          <Box>
+            <Text fontSize={18} fontWeight="700" colorScheme="gray">
+              {user?.name}
+            </Text>
+            <Text fontSize={16} fontWeight="400" colorScheme="gray" opacity={0.7}>
+              @{user?.username}
+            </Text>
+          </Box>
+        </WrapItem>
         <MenuNavLink
           href="/"
           name="Home"

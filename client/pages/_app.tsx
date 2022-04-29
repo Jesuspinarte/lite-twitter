@@ -7,7 +7,7 @@ import Nav from '../components/Nav';
 import CreateClient, { httpLink } from '../utils/CreateClient';
 import { CurrentUserDocument } from '../graphql/generated/graphql';
 import UserProvider from '../providers/UserProvider';
-import { Grid, GridItem, useColorModeValue } from '@chakra-ui/react';
+import { Box, Grid, GridItem } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 
 export const client = new ApolloClient({
@@ -25,18 +25,17 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
       <Chakra cookies={cookies}>
         <UserProvider user={user}>
           {pathname !== '/login' && pathname !== '/register' ? (
-            <Grid
-              templateColumns="repeat(12, 1fr)"
-              gap={4}
-            >
-              <GridItem m={0} w="100%" colSpan={3}>
-                <Nav />
-              </GridItem>
-              <GridItem m={0} w="100%" colSpan={6}>
-                <Component {...props} />
-              </GridItem>
-              <GridItem m={0} w="100%" colSpan={3} />
-            </Grid>
+            <Box w="100%" maxW="1200px" minH="100vh" m="auto" pt={4} pb={4}>
+              <Grid templateColumns="repeat(12, 1fr)" gap={4} height='100%'>
+                <GridItem m={0} w="100%" colSpan={3}>
+                  <Nav />
+                </GridItem>
+                <GridItem m={0} w="100%" colSpan={6}>
+                  <Component {...props} />
+                </GridItem>
+                <GridItem m={0} w="100%" colSpan={3} />
+              </Grid>
+            </Box>
           ) : (
             <>
               <Nav />
