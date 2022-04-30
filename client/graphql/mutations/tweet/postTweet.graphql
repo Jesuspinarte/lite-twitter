@@ -1,0 +1,13 @@
+mutation PostTweet($tweet: TweetInput!) {
+  postTweet(tweet: $tweet) {
+    errors {
+      field
+      message
+      type
+    }
+    tweet {
+      id
+      text
+    }
+  }
+}

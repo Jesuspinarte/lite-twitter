@@ -1,19 +1,18 @@
 import Head from 'next/head';
 import type { NextPage, NextPageContext } from 'next';
-import { Box, Container, Heading } from '@chakra-ui/react';
+import { Box, Container } from '@chakra-ui/react';
 
 import CreateClient from '../utils/CreateClient';
-import { FeedDocument } from '../graphql/generated/graphql';
+import { FeedDocument, Tweet } from '../graphql/generated/graphql';
+import Feed from '../components/feed/Feed';
 
 interface FeedProps {
-  feed: any;
+  tweets: Tweet[];
 }
 
-const Home: NextPage<FeedProps> = ({ feed }) => {
-  // console.table(feed?.tweets);
-
+const Home: NextPage<FeedProps> = ({ tweets }) => {
   return (
-    <Box as="main">
+    <Box>
       <Head>
         <title>Lite Twitter</title>
         <meta
@@ -22,9 +21,7 @@ const Home: NextPage<FeedProps> = ({ feed }) => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container>
-        <Heading as="h1">¡Holi!</Heading>
-      </Container>
+      <Feed tweets={tweets} />
     </Box>
   );
 };
@@ -37,14 +34,14 @@ export async function getServerSideProps(context: NextPageContext) {
     variables: {
       params: {
         page: 1,
-        perPage: 2,
+        perPage: 4,
       },
     },
   });
 
   return {
     props: {
-      feed: data.feed,
+      ...(data.feed || []),
     },
   };
 }

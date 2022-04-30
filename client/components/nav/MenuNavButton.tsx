@@ -20,6 +20,7 @@ const MenuNavButton: React.FC<MenuNavButtonProps> = ({
   selected = false,
 }) => {
   const menuColor = useColorModeValue('gray.500', 'white');
+  const hoverColor = useColorModeValue('blackAlpha.200', 'whiteAlpha.200');
 
   return (
     <ListItem
@@ -28,7 +29,7 @@ const MenuNavButton: React.FC<MenuNavButtonProps> = ({
       position="relative"
       color={menuColor}
       cursor="pointer"
-      _hover={{ backgroundColor: 'blackAlpha.200' }}
+      _hover={{ backgroundColor: hoverColor }}
     >
       {selected && (
         <Box

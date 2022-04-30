@@ -194,6 +194,19 @@ export default class TweetResolver {
     return mentions;
   }
 
+  @FieldResolver(() => (Tweet || null))
+  async tweet(@Root() tweet: Tweet, @Ctx() { prisma }: LTContext) {
+    if (!tweet.tweetId) {
+      return null;
+    }
+
+    return (
+      (await prisma.tweet.findUnique({
+        where: { id: tweet.tweetId },
+      })) || null
+    );
+  }
+
   @FieldResolver(() => [])
   async comments(@Root() tweet: Tweet, @Ctx() { prisma }: LTContext) {
     return (

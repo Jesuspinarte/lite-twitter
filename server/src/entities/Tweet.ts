@@ -7,6 +7,7 @@ import Vote from './Vote';
 @ObjectType()
 export default class Tweet {
   userId: string; // Not mapped with @Field to hide this property on the response.
+  tweetId: string; // Not mapped with @Field to hide this property on the response.
   usernameMentions: string[]; // Not mapped with @Field to hide this property on the response.
 
   @Field()

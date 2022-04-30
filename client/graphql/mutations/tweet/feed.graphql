@@ -16,6 +16,7 @@ query Feed($params: TweetParams!) {
       votesCount
       commentsCount
       hashtags
+      createdAt
       mentions {
         id
         username

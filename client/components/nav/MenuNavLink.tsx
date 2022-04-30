@@ -22,6 +22,7 @@ const MenuNavLink: React.FC<MenuNavLinkProps> = ({
   selected = false,
 }) => {
   const menuColor = useColorModeValue('gray.500', 'white');
+  const hoverColor = useColorModeValue('blackAlpha.200', 'whiteAlpha.200');
 
   return (
     <NextLink href={href} passHref>
@@ -32,7 +33,7 @@ const MenuNavLink: React.FC<MenuNavLinkProps> = ({
           p={2}
           position="relative"
           color={menuColor}
-          _hover={{ backgroundColor: 'blackAlpha.200', textDecoration: 'none' }}
+          _hover={{ backgroundColor: hoverColor, textDecoration: 'none' }}
         >
           {selected && (
             <Box

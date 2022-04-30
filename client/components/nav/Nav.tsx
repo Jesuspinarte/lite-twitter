@@ -2,31 +2,30 @@ import {
   Avatar,
   Box,
   IconButton,
-  Link,
   List,
-  ListItem,
   Text,
   useColorMode,
   useColorModeValue,
   WrapItem,
 } from '@chakra-ui/react';
-import NextLink from 'next/link';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
-import { useLogoutMutation } from '../graphql/generated/graphql';
+import { useLogoutMutation } from '../../graphql/generated/graphql';
 import { useRouter } from 'next/router';
-import { useUserContext } from '../providers/UserProvider';
+import { useUserContext } from '../../providers/UserProvider';
 import MenuNavLink from './MenuNavLink';
+import MenuNavButton from './MenuNavButton';
+
 import { RiUserFill } from 'react-icons/ri';
 import { BiPowerOff } from 'react-icons/bi';
 import { AiFillHome } from 'react-icons/ai';
-import MenuNavButton from './MenuNavButton';
+import UserInfo from '../shared/UserInfo';
 
 const Nav: React.FC = () => {
   const { user, setUser } = useUserContext();
   const { colorMode, toggleColorMode } = useColorMode();
 
   const modeBgColor = useColorModeValue('blackAlpha.300', 'whiteAlpha.300');
-  const menuBgColor = useColorModeValue('white', 'whiteAlpha.300');
+  const menuBgColor = useColorModeValue('white', 'whiteAlpha.100');
   const menuBoxShadowColor = useColorModeValue(
     '-1px 0 10px 1px #ccc',
     '-1px 0 10px 1px #111'
@@ -42,7 +41,11 @@ const Nav: React.FC = () => {
     await logOut();
   };
 
-  if (router.pathname === '/login' || router.pathname === '/register') {
+  if (
+    !user ||
+    router.pathname === '/login' ||
+    router.pathname === '/register'
+  ) {
     return (
       <IconButton
         icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
@@ -66,7 +69,6 @@ const Nav: React.FC = () => {
       left={0}
       width="100%"
       backgroundColor={menuBgColor}
-      // height="calc(100vh - 2rem)"
       boxShadow={menuBoxShadowColor}
       position="relative"
       p={4}
@@ -74,25 +76,13 @@ const Nav: React.FC = () => {
       borderRadius={6}
     >
       <List>
-        <WrapItem
-          display="flex"
-          alignItems="center"
-          justifyContent="flex-start"
-          flexFlow="row"
-          pt={12}
-          pb={12}
-          mb={4}
-        >
-          <Avatar name={user?.name} size="lg" mr={4} />
-          <Box>
-            <Text fontSize={18} fontWeight="700" colorScheme="gray">
-              {user?.name}
-            </Text>
-            <Text fontSize={16} fontWeight="400" colorScheme="gray" opacity={0.7}>
-              @{user?.username}
-            </Text>
-          </Box>
-        </WrapItem>
+        <UserInfo
+          name={user.name}
+          nameFontSize={18}
+          size="lg"
+          username={user.username}
+          usernameFontSize={16}
+        />
         <MenuNavLink
           href="/"
           name="Home"
@@ -100,10 +90,10 @@ const Nav: React.FC = () => {
           selected={router.pathname === '/'}
         />
         <MenuNavLink
-          href="/profile"
-          name="Profile"
+          href="/activity"
+          name="Activity"
           icon={RiUserFill}
-          selected={router.pathname === '/profile'}
+          selected={router.pathname === '/activity'}
         />
         <MenuNavButton onClick={handleLogOut} name="Logout" icon={BiPowerOff} />
       </List>
