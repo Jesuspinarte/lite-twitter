@@ -96,6 +96,7 @@ export type Tweet = {
   comments: Array<Tweet>;
   commentsCount: Scalars['Float'];
   createdAt: Scalars['DateTime'];
+  hasVote: Scalars['Boolean'];
   hashtags: Array<Scalars['String']>;
   id: Scalars['String'];
   mentions: Array<User>;
@@ -184,37 +185,51 @@ export type VotesResponse = {
   votes?: Maybe<Array<Vote>>;
 };
 
-export type FeedQueryVariables = Exact<{
-  params: TweetParams;
-}>;
+export type ErrorInfoFragment = {
+  __typename?: 'ErrorMessage';
+  field?: string | null;
+  message: string;
+};
 
-export type FeedQuery = {
-  __typename?: 'Query';
-  feed: {
-    __typename?: 'TweetsResponse';
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-      type?: string | null;
-    }> | null;
-    tweets?: Array<{
-      __typename?: 'Tweet';
-      id: string;
-      text: string;
-      votesCount: number;
-      commentsCount: number;
-      hashtags: Array<string>;
-      createdAt: any;
-      user: { __typename?: 'User'; id: string; name: string; username: string };
-      mentions: Array<{
-        __typename?: 'User';
-        id: string;
-        username: string;
-        name: string;
-      }>;
-    }> | null;
-  };
+export type FullErrorInfoFragment = {
+  __typename?: 'ErrorMessage';
+  field?: string | null;
+  message: string;
+  type?: string | null;
+};
+
+export type TweetInfoFragment = {
+  __typename?: 'Tweet';
+  id: string;
+  text: string;
+  votesCount: number;
+  commentsCount: number;
+  hashtags: Array<string>;
+  createdAt: any;
+  hasVote: boolean;
+  user: { __typename?: 'User'; id: string; name: string; username: string };
+  mentions: Array<{
+    __typename?: 'User';
+    id: string;
+    username: string;
+    name: string;
+  }>;
+};
+
+export type UserInfoFragment = {
+  __typename?: 'User';
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  createdAt: any;
+};
+
+export type VoteInfoFragment = {
+  __typename?: 'Vote';
+  id: string;
+  user: { __typename?: 'User'; name: string };
+  tweet: { __typename?: 'Tweet'; text: string };
 };
 
 export type PostTweetMutationVariables = Exact<{
@@ -287,6 +302,108 @@ export type RegisterMutation = {
   };
 };
 
+export type UnvoteMutationVariables = Exact<{
+  tweetId: Scalars['String'];
+}>;
+
+export type UnvoteMutation = {
+  __typename?: 'Mutation';
+  unvote: {
+    __typename?: 'VoteResponse';
+    errors?: Array<{
+      __typename?: 'ErrorMessage';
+      field?: string | null;
+      message: string;
+      type?: string | null;
+    }> | null;
+    vote?: {
+      __typename?: 'Vote';
+      id: string;
+      user: { __typename?: 'User'; name: string };
+      tweet: { __typename?: 'Tweet'; text: string };
+    } | null;
+  };
+};
+
+export type VoteMutationVariables = Exact<{
+  tweetId: Scalars['String'];
+}>;
+
+export type VoteMutation = {
+  __typename?: 'Mutation';
+  vote: {
+    __typename?: 'VoteResponse';
+    errors?: Array<{
+      __typename?: 'ErrorMessage';
+      field?: string | null;
+      message: string;
+      type?: string | null;
+    }> | null;
+    vote?: {
+      __typename?: 'Vote';
+      id: string;
+      user: { __typename?: 'User'; name: string };
+      tweet: { __typename?: 'Tweet'; text: string };
+    } | null;
+  };
+};
+
+export type FeedQueryVariables = Exact<{
+  params: TweetParams;
+}>;
+
+export type FeedQuery = {
+  __typename?: 'Query';
+  feed: {
+    __typename?: 'TweetsResponse';
+    errors?: Array<{
+      __typename?: 'ErrorMessage';
+      field?: string | null;
+      message: string;
+      type?: string | null;
+    }> | null;
+    tweets?: Array<{
+      __typename?: 'Tweet';
+      id: string;
+      text: string;
+      votesCount: number;
+      commentsCount: number;
+      hashtags: Array<string>;
+      createdAt: any;
+      hasVote: boolean;
+      tweet?: {
+        __typename?: 'Tweet';
+        id: string;
+        text: string;
+        votesCount: number;
+        commentsCount: number;
+        hashtags: Array<string>;
+        createdAt: any;
+        hasVote: boolean;
+        user: {
+          __typename?: 'User';
+          id: string;
+          name: string;
+          username: string;
+        };
+        mentions: Array<{
+          __typename?: 'User';
+          id: string;
+          username: string;
+          name: string;
+        }>;
+      } | null;
+      user: { __typename?: 'User'; id: string; name: string; username: string };
+      mentions: Array<{
+        __typename?: 'User';
+        id: string;
+        username: string;
+        name: string;
+      }>;
+    }> | null;
+  };
+};
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CurrentUserQuery = {
@@ -296,91 +413,79 @@ export type CurrentUserQuery = {
     errors?: Array<{
       __typename?: 'ErrorMessage';
       field?: string | null;
-      type?: string | null;
       message: string;
+      type?: string | null;
     }> | null;
     user?: {
       __typename?: 'User';
       id: string;
-      email: string;
       name: string;
       username: string;
+      email: string;
       createdAt: any;
     } | null;
   };
 };
 
-export const FeedDocument = gql`
-  query Feed($params: TweetParams!) {
-    feed(params: $params) {
-      errors {
-        field
-        message
-        type
-      }
-      tweets {
-        id
-        text
-        user {
-          id
-          name
-          username
-        }
-        votesCount
-        commentsCount
-        hashtags
-        createdAt
-        mentions {
-          id
-          username
-          name
-        }
-      }
+export const ErrorInfoFragmentDoc = gql`
+  fragment ErrorInfo on ErrorMessage {
+    field
+    message
+  }
+`;
+export const FullErrorInfoFragmentDoc = gql`
+  fragment FullErrorInfo on ErrorMessage {
+    field
+    message
+    type
+  }
+`;
+export const TweetInfoFragmentDoc = gql`
+  fragment TweetInfo on Tweet {
+    id
+    text
+    votesCount
+    commentsCount
+    hashtags
+    createdAt
+    hasVote
+    user {
+      id
+      name
+      username
+    }
+    mentions {
+      id
+      username
+      name
     }
   }
 `;
-
-/**
- * __useFeedQuery__
- *
- * To run a query within a React component, call `useFeedQuery` and pass it any options that fit your needs.
- * When your component renders, `useFeedQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useFeedQuery({
- *   variables: {
- *      params: // value for 'params'
- *   },
- * });
- */
-export function useFeedQuery(
-  baseOptions: Apollo.QueryHookOptions<FeedQuery, FeedQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<FeedQuery, FeedQueryVariables>(FeedDocument, options);
-}
-export function useFeedLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<FeedQuery, FeedQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<FeedQuery, FeedQueryVariables>(
-    FeedDocument,
-    options
-  );
-}
-export type FeedQueryHookResult = ReturnType<typeof useFeedQuery>;
-export type FeedLazyQueryHookResult = ReturnType<typeof useFeedLazyQuery>;
-export type FeedQueryResult = Apollo.QueryResult<FeedQuery, FeedQueryVariables>;
+export const UserInfoFragmentDoc = gql`
+  fragment UserInfo on User {
+    id
+    name
+    username
+    email
+    createdAt
+  }
+`;
+export const VoteInfoFragmentDoc = gql`
+  fragment VoteInfo on Vote {
+    id
+    user {
+      name
+    }
+    tweet {
+      text
+    }
+  }
+`;
 export const PostTweetDocument = gql`
   mutation PostTweet($tweet: TweetInput!) {
     postTweet(tweet: $tweet) {
       errors {
-        field
-        message
-        type
+        ...FullErrorInfo
       }
       tweet {
         id
@@ -388,6 +493,7 @@ export const PostTweetDocument = gql`
       }
     }
   }
+  ${FullErrorInfoFragmentDoc}
 `;
 export type PostTweetMutationFn = Apollo.MutationFunction<
   PostTweetMutation,
@@ -435,18 +541,15 @@ export const LoginDocument = gql`
   mutation Login($user: UserLoginInput!) {
     login(user: $user) {
       errors {
-        field
-        message
+        ...ErrorInfo
       }
       user {
-        id
-        name
-        username
-        email
-        createdAt
+        ...UserInfo
       }
     }
   }
+  ${ErrorInfoFragmentDoc}
+  ${UserInfoFragmentDoc}
 `;
 export type LoginMutationFn = Apollo.MutationFunction<
   LoginMutation,
@@ -536,18 +639,15 @@ export const RegisterDocument = gql`
   mutation Register($user: UserInput!) {
     register(user: $user) {
       errors {
-        field
-        message
+        ...ErrorInfo
       }
       user {
-        id
-        name
-        username
-        email
-        createdAt
+        ...UserInfo
       }
     }
   }
+  ${ErrorInfoFragmentDoc}
+  ${UserInfoFragmentDoc}
 `;
 export type RegisterMutationFn = Apollo.MutationFunction<
   RegisterMutation,
@@ -589,23 +689,176 @@ export type RegisterMutationOptions = Apollo.BaseMutationOptions<
   RegisterMutation,
   RegisterMutationVariables
 >;
+export const UnvoteDocument = gql`
+  mutation Unvote($tweetId: String!) {
+    unvote(tweetId: $tweetId) {
+      errors {
+        ...FullErrorInfo
+      }
+      vote {
+        ...VoteInfo
+      }
+    }
+  }
+  ${FullErrorInfoFragmentDoc}
+  ${VoteInfoFragmentDoc}
+`;
+export type UnvoteMutationFn = Apollo.MutationFunction<
+  UnvoteMutation,
+  UnvoteMutationVariables
+>;
+
+/**
+ * __useUnvoteMutation__
+ *
+ * To run a mutation, you first call `useUnvoteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUnvoteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [unvoteMutation, { data, loading, error }] = useUnvoteMutation({
+ *   variables: {
+ *      tweetId: // value for 'tweetId'
+ *   },
+ * });
+ */
+export function useUnvoteMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UnvoteMutation,
+    UnvoteMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<UnvoteMutation, UnvoteMutationVariables>(
+    UnvoteDocument,
+    options
+  );
+}
+export type UnvoteMutationHookResult = ReturnType<typeof useUnvoteMutation>;
+export type UnvoteMutationResult = Apollo.MutationResult<UnvoteMutation>;
+export type UnvoteMutationOptions = Apollo.BaseMutationOptions<
+  UnvoteMutation,
+  UnvoteMutationVariables
+>;
+export const VoteDocument = gql`
+  mutation Vote($tweetId: String!) {
+    vote(tweetId: $tweetId) {
+      errors {
+        ...FullErrorInfo
+      }
+      vote {
+        ...VoteInfo
+      }
+    }
+  }
+  ${FullErrorInfoFragmentDoc}
+  ${VoteInfoFragmentDoc}
+`;
+export type VoteMutationFn = Apollo.MutationFunction<
+  VoteMutation,
+  VoteMutationVariables
+>;
+
+/**
+ * __useVoteMutation__
+ *
+ * To run a mutation, you first call `useVoteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVoteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [voteMutation, { data, loading, error }] = useVoteMutation({
+ *   variables: {
+ *      tweetId: // value for 'tweetId'
+ *   },
+ * });
+ */
+export function useVoteMutation(
+  baseOptions?: Apollo.MutationHookOptions<VoteMutation, VoteMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<VoteMutation, VoteMutationVariables>(
+    VoteDocument,
+    options
+  );
+}
+export type VoteMutationHookResult = ReturnType<typeof useVoteMutation>;
+export type VoteMutationResult = Apollo.MutationResult<VoteMutation>;
+export type VoteMutationOptions = Apollo.BaseMutationOptions<
+  VoteMutation,
+  VoteMutationVariables
+>;
+export const FeedDocument = gql`
+  query Feed($params: TweetParams!) {
+    feed(params: $params) {
+      errors {
+        ...FullErrorInfo
+      }
+      tweets {
+        ...TweetInfo
+        tweet {
+          ...TweetInfo
+        }
+      }
+    }
+  }
+  ${FullErrorInfoFragmentDoc}
+  ${TweetInfoFragmentDoc}
+`;
+
+/**
+ * __useFeedQuery__
+ *
+ * To run a query within a React component, call `useFeedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFeedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFeedQuery({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useFeedQuery(
+  baseOptions: Apollo.QueryHookOptions<FeedQuery, FeedQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<FeedQuery, FeedQueryVariables>(FeedDocument, options);
+}
+export function useFeedLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<FeedQuery, FeedQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<FeedQuery, FeedQueryVariables>(
+    FeedDocument,
+    options
+  );
+}
+export type FeedQueryHookResult = ReturnType<typeof useFeedQuery>;
+export type FeedLazyQueryHookResult = ReturnType<typeof useFeedLazyQuery>;
+export type FeedQueryResult = Apollo.QueryResult<FeedQuery, FeedQueryVariables>;
 export const CurrentUserDocument = gql`
   query CurrentUser {
     currentUser {
       errors {
-        field
-        type
-        message
+        ...FullErrorInfo
       }
       user {
-        id
-        email
-        name
-        username
-        createdAt
+        ...UserInfo
       }
     }
   }
+  ${FullErrorInfoFragmentDoc}
+  ${UserInfoFragmentDoc}
 `;
 
 /**

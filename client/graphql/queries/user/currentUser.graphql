@@ -1,16 +1,10 @@
-query CurrentUser{
+query CurrentUser {
   currentUser {
     errors {
-      field
-      type
-      message
+      ...FullErrorInfo
     }
     user {
-      id
-      email
-      name
-      username
-      createdAt
+      ...UserInfo
     }
   }
 }

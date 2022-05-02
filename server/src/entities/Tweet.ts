@@ -42,6 +42,9 @@ export default class Tweet {
 
   @Field()
   commentsCount: number;
+
+  @Field()
+  hasVote: boolean;
 }
 
 @ObjectType()

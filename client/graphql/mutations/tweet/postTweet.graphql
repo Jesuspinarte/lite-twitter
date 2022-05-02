@@ -1,9 +1,7 @@
 mutation PostTweet($tweet: TweetInput!) {
   postTweet(tweet: $tweet) {
     errors {
-      field
-      message
-      type
+      ...FullErrorInfo
     }
     tweet {
       id

@@ -1,0 +1,5 @@
+fragment FullErrorInfo on ErrorMessage {
+  field
+  message
+  type
+}

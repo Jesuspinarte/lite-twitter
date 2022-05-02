@@ -1,0 +1,19 @@
+fragment TweetInfo on Tweet {
+  id
+  text
+  votesCount
+  commentsCount
+  hashtags
+  createdAt
+  hasVote
+  user {
+    id
+    name
+    username
+  }
+  mentions {
+    id
+    username
+    name
+  }
+}

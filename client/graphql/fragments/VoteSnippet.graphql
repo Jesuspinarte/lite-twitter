@@ -1,0 +1,9 @@
+fragment VoteInfo on Vote {
+  id
+  user {
+    name
+  }
+  tweet {
+    text
+  }
+}

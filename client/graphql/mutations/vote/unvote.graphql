@@ -1,0 +1,10 @@
+mutation Unvote($tweetId: String!) {
+  unvote(tweetId: $tweetId) {
+    errors {
+      ...FullErrorInfo
+    }
+    vote {
+      ...VoteInfo
+    }
+  }
+}

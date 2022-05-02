@@ -1,15 +1,10 @@
 mutation Register($user: UserInput!) {
   register(user: $user) {
     errors {
-      field
-      message
+      ...ErrorInfo
     }
     user {
-      id
-      name
-      username
-      email
-      createdAt
+      ...UserInfo
     }
   }
 }

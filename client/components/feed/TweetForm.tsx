@@ -6,6 +6,7 @@ import {
   Text,
   Textarea,
   useColorModeValue,
+  useToast,
 } from '@chakra-ui/react';
 import { useMemo, useRef, useState } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
@@ -22,19 +23,44 @@ const TweetForm: React.FC = () => {
   const textCounterErrorColor = useColorModeValue('red.400', 'red.300');
 
   const [textCount, setTextCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
   const tweetText = useRef<HTMLTextAreaElement>(null);
 
   const [postTweet] = usePostTweetMutation({
     variables: { tweet: { text: tweetText.current?.value || '' } },
-    onCompleted: () => alert('Tweet posted'),
+    onCompleted: ({ postTweet }) => {
+      if (!postTweet.errors) {
+        toast({
+          title: 'Tweet published!',
+          position: 'bottom',
+          isClosable: true,
+          status: 'success',
+        });
+
+        if (tweetText.current) {
+          tweetText.current.value = '';
+          setTextCount(0);
+        }
+      } else {
+        toast({
+          title: 'There was an unexpected error.',
+          position: 'bottom',
+          isClosable: true,
+          status: 'error',
+        });
+      }
+    },
   });
 
   const handleSubmit = async (event: React.FormEvent<HTMLDivElement>) => {
     event.preventDefault();
 
     if (tweetText.current?.value) {
+      setIsLoading(true);
       await postTweet();
+      setIsLoading(false);
     }
   };
 
@@ -95,6 +121,7 @@ const TweetForm: React.FC = () => {
           color={submitTextColor}
           pr={10}
           pl={10}
+          isLoading={isLoading}
         >
           Tweet
         </Button>

@@ -1,0 +1,13 @@
+query Feed($params: TweetParams!) {
+  feed(params: $params) {
+    errors {
+      ...FullErrorInfo
+    }
+    tweets {
+      ...TweetInfo
+      tweet {
+        ...TweetInfo
+      }
+    }
+  }
+}

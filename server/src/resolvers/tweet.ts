@@ -216,7 +216,7 @@ export default class TweetResolver {
     );
   }
 
-  @FieldResolver(() => [])
+  @FieldResolver()
   async commentsCount(@Root() tweet: Tweet, @Ctx() { prisma }: LTContext) {
     return (
       (await prisma.tweet.count({
@@ -234,12 +234,28 @@ export default class TweetResolver {
     );
   }
 
-  @FieldResolver(() => [])
+  @FieldResolver()
   async votesCount(@Root() tweet: Tweet, @Ctx() { prisma }: LTContext) {
     return (
       (await prisma.vote.count({
         where: { tweetId: tweet.id },
       })) || 0
     );
+  }
+
+  @FieldResolver(() => [])
+  async hasVote(@Root() tweet: Tweet, @Ctx() { prisma, req }: LTContext) {
+    const { userId, errors: newErrors } = getAuthUser(req);
+    const errors: ErrorMessage[] = [...(newErrors || [])];
+
+    if (errors.length) {
+      return { errors };
+    }
+
+    const vote = await prisma.vote.findFirst({
+      where: { tweetId: tweet.id, userId },
+    });
+
+    return vote ? true : false;
   }
 }

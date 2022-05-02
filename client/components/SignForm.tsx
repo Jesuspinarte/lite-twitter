@@ -243,6 +243,10 @@ export const SignForm: React.FC<SignFormProps> = ({ signIn = true }) => {
     });
   };
 
+  const removeAllErrorsOnChange = () => {
+    setErrors({});
+  };
+
   const validateConfirmPassword = (
     currentConfirmPassword: string | undefined
   ) => {
@@ -371,7 +375,7 @@ export const SignForm: React.FC<SignFormProps> = ({ signIn = true }) => {
             p={4}
             ref={username}
             _autofill={autoFillStyles}
-            onChange={removeErrorsOnChange}
+            onChange={signIn ? removeAllErrorsOnChange : removeErrorsOnChange}
             disabled={disableForm}
             required
           />
@@ -480,7 +484,7 @@ export const SignForm: React.FC<SignFormProps> = ({ signIn = true }) => {
               _autofill={autoFillStyles}
               onChange={
                 signIn
-                  ? removeErrorsOnChange
+                  ? removeAllErrorsOnChange
                   : e => {
                       validateConfirmPassword(confirmPassword.current?.value);
                       removeErrorsOnChange(e);
@@ -548,6 +552,7 @@ export const SignForm: React.FC<SignFormProps> = ({ signIn = true }) => {
             backgroundColor={submitBgColor}
             color={submitTextColor}
             disabled={!canSubmit || disableForm}
+            isLoading={isLoading}
             mr={6}
             pr={10}
             pl={10}
