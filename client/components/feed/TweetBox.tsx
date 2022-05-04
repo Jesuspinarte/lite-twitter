@@ -3,18 +3,17 @@ import React, { Fragment, useMemo } from 'react';
 import { Tweet } from '../../graphql/generated/graphql';
 import timeAgo from '../../utils/timeAgo';
 import UserInfo from '../shared/UserInfo';
+import TweetData from './TweetData';
 import TweetInteractions from './TweetInteractions';
 
-const TweetBox: React.FC<Tweet> = ({
-  commentsCount,
-  id,
-  text,
-  createdAt,
-  hasVote,
-  user: { name, username },
-  votesCount,
-  tweet,
-}) => {
+const TweetBox: React.FC<Tweet> = props => {
+  const {
+    text,
+    createdAt,
+    user: { name, username },
+    tweet,
+  } = props;
+
   const bgColor = useColorModeValue('white', 'whiteAlpha.100');
   const replyBgColor = useColorModeValue('#ddd', '#444');
   const borderColor = useColorModeValue('1px solid #ddd', '1px solid #444');
@@ -72,21 +71,9 @@ const TweetBox: React.FC<Tweet> = ({
         _last={{ borderBottomRadius: 6, borderBottom: 0 }}
         pos="relative"
       >
-        <Box backgroundColor={bgColor} p={8} pos="relative">
-          <Flex justifyContent="space-between">
-            <UserInfo
-              name={tweet.user.name}
-              username={tweet.user.username}
-              pt={0}
-              pb={0}
-              mb={4}
-            />
-            <Text color={textDateColor}>{repliedPostedAt}</Text>
-          </Flex>
-          <Text ml={16} color={textColor}>
-            {repliedBodyText}
-          </Text>
-          <TweetInteractions id={tweet.id} hasVote={tweet.hasVote} />
+        <Box backgroundColor={bgColor} p={8} pb={4} pos="relative">
+          <TweetData {...tweet} />
+          <TweetInteractions {...tweet} />
           <Box
             pos="absolute"
             h="100%"
@@ -96,15 +83,9 @@ const TweetBox: React.FC<Tweet> = ({
             left="54px"
           />
         </Box>
-        <Box backgroundColor={bgColor} p={8}>
-          <Flex justifyContent="space-between">
-            <UserInfo name={name} username={username} pt={0} pb={0} mb={4} />
-            <Text color={textDateColor}>{postedAt}</Text>
-          </Flex>
-          <Text ml={16} color={textColor}>
-            {bodyText}
-          </Text>
-          <TweetInteractions id={id} hasVote={hasVote} />
+        <Box backgroundColor={bgColor} p={8} pb={4}>
+          <TweetData {...props} />
+          <TweetInteractions {...props} />
         </Box>
       </Box>
     );
@@ -113,18 +94,13 @@ const TweetBox: React.FC<Tweet> = ({
   return (
     <Box
       backgroundColor={bgColor}
-      p={4}
+      p={8}
+      pb={4}
       borderBottom={borderColor}
       _last={{ borderBottomRadius: 6, borderBottom: 0 }}
     >
-      <Flex justifyContent="space-between">
-        <UserInfo name={name} username={username} pt={0} pb={0} mb={4} />
-        <Text color={textDateColor}>{postedAt}</Text>
-      </Flex>
-      <Text ml={16} color={textColor}>
-        {bodyText}
-      </Text>
-      <TweetInteractions id={id} hasVote={hasVote} />
+      <TweetData {...props} />
+      <TweetInteractions {...props} />
     </Box>
   );
 };

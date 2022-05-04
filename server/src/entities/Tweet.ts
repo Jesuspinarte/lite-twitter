@@ -54,6 +54,12 @@ export class TweetsResponse {
 
   @Field(() => [Tweet], { nullable: true })
   tweets?: Tweet[];
+
+  @Field({ nullable: true })
+  nextSkip?: number;
+
+  @Field({ nullable: true })
+  nextTake?: number;
 }
 
 @ObjectType()
@@ -64,3 +70,13 @@ export class TweetResponse {
   @Field(() => Tweet, { nullable: true })
   tweet?: Tweet;
 }
+
+@ObjectType()
+export class TweetSubscriptionResponse {
+  @Field(() => [ErrorMessage], { nullable: true })
+  errors?: ErrorMessage[];
+
+  @Field(() => String, { nullable: true })
+  tweetId?: string;
+}
+

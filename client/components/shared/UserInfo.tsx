@@ -23,6 +23,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
   mb = 4,
 }) => (
   <WrapItem
+    as="div"
     display="flex"
     alignItems="center"
     justifyContent="flex-start"

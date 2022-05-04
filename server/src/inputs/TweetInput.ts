@@ -12,8 +12,20 @@ export default class TweetInput {
 @InputType()
 export class TweetParams {
   @Field({ nullable: true })
-  page?: number;
+  skip?: number;
 
   @Field({ nullable: true })
-  perPage?: number;
+  take?: number;
+}
+
+@InputType()
+export class UserTweetsParams {
+  @Field()
+  userId: string;
+
+  @Field({ nullable: true })
+  skip?: number;
+
+  @Field({ nullable: true })
+  take?: number;
 }

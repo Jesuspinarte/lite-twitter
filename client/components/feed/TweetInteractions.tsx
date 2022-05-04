@@ -1,4 +1,17 @@
-import { Box, IconButton, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  IconButton,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
+  useToast,
+} from '@chakra-ui/react';
 
 import { MdOutlineModeComment } from 'react-icons/md';
 import { IoMdHeart, IoMdHeartEmpty } from 'react-icons/io';
@@ -9,18 +22,15 @@ import {
   useVoteMutation,
 } from '../../graphql/generated/graphql';
 import { useState } from 'react';
+import TweetForm from './TweetForm';
+import TweetData from './TweetData';
 
-interface TweetInteractionsProps {
-  id: string;
-  hasVote: boolean;
-}
+const TweetInteractions: React.FC<Tweet> = props => {
+  const { id, hasVote } = props;
 
-const TweetInteractions: React.FC<TweetInteractionsProps> = ({
-  id,
-  hasVote,
-}) => {
   const [hasVoted, setHasVoted] = useState(hasVote);
   const [isLoadingVote, setIsLoadingVote] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
   const [voteForTweet] = useVoteMutation({
@@ -80,6 +90,7 @@ const TweetInteractions: React.FC<TweetInteractionsProps> = ({
         w={8}
         minW={8}
         _focus={{ outline: 'none' }}
+        onClick={onOpen}
       />
       {hasVoted ? (
         <IconButton
@@ -120,6 +131,22 @@ const TweetInteractions: React.FC<TweetInteractionsProps> = ({
           }}
         />
       )}
+      <Modal onClose={onClose} isOpen={isOpen} isCentered size="xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalBody pr={0} pl={0} pt={8} pb={0}>
+            <Box p={4} pb={8}>
+              <TweetData {...props} />
+            </Box>
+            <TweetForm
+              onSubmit={onClose}
+              placeholder="Tweet your reply"
+              tweetId={id}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };

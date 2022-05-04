@@ -1,11 +1,39 @@
-import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client';
-import { NextPageContext } from 'next';
+import { ApolloClient, createHttpLink, InMemoryCache, split } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+
+import { createClient } from 'graphql-ws';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { getMainDefinition } from '@apollo/client/utilities';
 
 export const httpLink = createHttpLink({
   uri: 'http://localhost:4000/graphql',
   credentials: 'include',
 });
+
+export const newSplitLink = () => {
+  const wsLink = new GraphQLWsLink(
+    createClient({
+      url: 'ws://localhost:4000/graphql',
+      connectionParams: () => {
+        return {
+          Authorization: `Bearer aksldjaksl`,
+        };
+      },
+    }),
+  );
+
+  return split(
+    ({ query }) => {
+      const definition = getMainDefinition(query);
+      return (
+        definition.kind === 'OperationDefinition' &&
+        definition.operation === 'subscription'
+      );
+    },
+    wsLink,
+    httpLink,
+  );
+};
 
 const CreateClient = (cookie?: string | null) => {
   const authLink = setContext((_, { headers }) => {

@@ -8,11 +8,21 @@ import {
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 import { usePostTweetMutation } from '../../graphql/generated/graphql';
 
-const TweetForm: React.FC = () => {
+interface TweetFormProps {
+  onSubmit?: () => void;
+  placeholder?: string;
+  tweetId?: string;
+}
+
+const TweetForm: React.FC<TweetFormProps> = ({
+  onSubmit,
+  placeholder,
+  tweetId,
+}) => {
   const bgColor = useColorModeValue('#dcdcdc', 'whiteAlpha.300');
   const submitBgColor = useColorModeValue('gray.700', 'teal.200');
   const submitTextColor = useColorModeValue('whiteAlpha.900', 'gray.800');
@@ -28,8 +38,19 @@ const TweetForm: React.FC = () => {
 
   const tweetText = useRef<HTMLTextAreaElement>(null);
 
+  useEffect(() => {
+    if (tweetText.current) {
+      tweetText.current.focus();
+    }
+  }, []);
+
   const [postTweet] = usePostTweetMutation({
-    variables: { tweet: { text: tweetText.current?.value || '' } },
+    variables: {
+      tweet: {
+        text: tweetText.current?.value || '',
+        ...(tweetId && { tweetId }),
+      },
+    },
     onCompleted: ({ postTweet }) => {
       if (!postTweet.errors) {
         toast({
@@ -54,13 +75,24 @@ const TweetForm: React.FC = () => {
     },
   });
 
-  const handleSubmit = async (event: React.FormEvent<HTMLDivElement>) => {
-    event.preventDefault();
+  const handleSubmit = async (event?: React.FormEvent<HTMLDivElement>) => {
+    event?.preventDefault();
 
     if (tweetText.current?.value) {
       setIsLoading(true);
       await postTweet();
+      if (onSubmit) {
+        onSubmit();
+      }
       setIsLoading(false);
+    }
+  };
+
+  const handleCtrlEnter = async (
+    event: React.KeyboardEvent<HTMLDivElement>
+  ) => {
+    if (event.ctrlKey && event.key === 'Enter') {
+      handleSubmit();
     }
   };
 
@@ -76,6 +108,7 @@ const TweetForm: React.FC = () => {
       borderTopRadius={6}
       textAlign="right"
       onSubmit={handleSubmit}
+      onKeyDown={handleCtrlEnter}
       flexFlow="column wrap"
     >
       <Textarea
@@ -90,7 +123,7 @@ const TweetForm: React.FC = () => {
         backgroundColor="transparent"
         mb={2}
         maxLength={280}
-        placeholder="What's happening?"
+        placeholder={placeholder || "What's happening?"}
         pt={4}
         pb={8}
         ref={tweetText}

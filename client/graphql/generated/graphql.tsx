@@ -38,6 +38,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   postTweet: TweetResponse;
   register: UserResponse;
+  sendMessage: Scalars['String'];
   unvote: VoteResponse;
   updateUserInfo: UserResponse;
   vote: VoteResponse;
@@ -61,6 +62,10 @@ export type MutationPostTweetArgs = {
 
 export type MutationRegisterArgs = {
   user: UserInput;
+};
+
+export type MutationSendMessageArgs = {
+  message: Scalars['String'];
 };
 
 export type MutationUnvoteArgs = {
@@ -89,6 +94,12 @@ export type Query = {
 
 export type QueryFeedArgs = {
   params?: InputMaybe<TweetParams>;
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  feedNotifications: TweetSubscriptionResponse;
+  receiveMessage: Scalars['String'];
 };
 
 export type Tweet = {
@@ -121,6 +132,12 @@ export type TweetResponse = {
   __typename?: 'TweetResponse';
   errors?: Maybe<Array<ErrorMessage>>;
   tweet?: Maybe<Tweet>;
+};
+
+export type TweetSubscriptionResponse = {
+  __typename?: 'TweetSubscriptionResponse';
+  errors?: Maybe<Array<ErrorMessage>>;
+  tweetId?: Maybe<Scalars['String']>;
 };
 
 export type TweetsResponse = {
@@ -424,6 +441,24 @@ export type CurrentUserQuery = {
       email: string;
       createdAt: any;
     } | null;
+  };
+};
+
+export type FeedNotificationsSubscriptionVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type FeedNotificationsSubscription = {
+  __typename?: 'Subscription';
+  feedNotifications: {
+    __typename?: 'TweetSubscriptionResponse';
+    tweetId?: string | null;
+    errors?: Array<{
+      __typename?: 'ErrorMessage';
+      field?: string | null;
+      message: string;
+      type?: string | null;
+    }> | null;
   };
 };
 
@@ -908,3 +943,48 @@ export type CurrentUserQueryResult = Apollo.QueryResult<
   CurrentUserQuery,
   CurrentUserQueryVariables
 >;
+export const FeedNotificationsDocument = gql`
+  subscription FeedNotifications {
+    feedNotifications {
+      errors {
+        field
+        message
+        type
+      }
+      tweetId
+    }
+  }
+`;
+
+/**
+ * __useFeedNotificationsSubscription__
+ *
+ * To run a query within a React component, call `useFeedNotificationsSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useFeedNotificationsSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFeedNotificationsSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useFeedNotificationsSubscription(
+  baseOptions?: Apollo.SubscriptionHookOptions<
+    FeedNotificationsSubscription,
+    FeedNotificationsSubscriptionVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSubscription<
+    FeedNotificationsSubscription,
+    FeedNotificationsSubscriptionVariables
+  >(FeedNotificationsDocument, options);
+}
+export type FeedNotificationsSubscriptionHookResult = ReturnType<
+  typeof useFeedNotificationsSubscription
+>;
+export type FeedNotificationsSubscriptionResult =
+  Apollo.SubscriptionResult<FeedNotificationsSubscription>;

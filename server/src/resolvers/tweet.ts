@@ -1,5 +1,5 @@
-import Tweet, { TweetResponse, TweetsResponse } from '../entities/Tweet';
-import TweetInput, { TweetParams } from '../inputs/TweetInput';
+import Tweet, { TweetResponse, TweetsResponse, TweetSubscriptionResponse } from '../entities/Tweet';
+import TweetInput, { TweetParams, UserTweetsParams } from '../inputs/TweetInput';
 import { LTContext } from '../utils/types';
 import {
   Arg,
@@ -9,6 +9,7 @@ import {
   Query,
   Resolver,
   Root,
+  Subscription,
 } from 'type-graphql';
 import { getAuthUser, getTagsAndMentions } from '../utils/helpers';
 import ErrorMessage from '../entities/ErrorMessage';
@@ -19,7 +20,7 @@ export default class TweetResolver {
   @Mutation(() => TweetResponse)
   async postTweet(
     @Arg('tweet') tweetInput: TweetInput,
-    @Ctx() { prisma, req }: LTContext
+    @Ctx() { prisma, pubsub, req }: LTContext
   ) {
     const { userId, errors: newErrors } = getAuthUser(req);
     const errors: ErrorMessage[] = [...(newErrors || [])];
@@ -81,6 +82,7 @@ export default class TweetResolver {
       return { errors };
     }
 
+    await pubsub.publish('FEED_NOTIFICATIONS', tweet);
     return { tweet };
   }
 
@@ -155,21 +157,78 @@ export default class TweetResolver {
   ) {
     const { errors: newErrors } = getAuthUser(req);
     const errors: ErrorMessage[] = [...(newErrors || [])];
+
     if (errors.length) {
       return { errors };
     }
 
-    const page = params?.page ? params.page - 1 : 0;
-    const perPage = params?.perPage || 10;
-    const skip = page * perPage;
+    const skip = params?.skip || 0;
+    const take = params?.take || 10;
+
+    const tweetsCount = await prisma.tweet.count();
+    const nextSkip = skip + take;
+    const nextTake = tweetsCount > nextSkip ? take : null;
 
     const tweets = await prisma.tweet.findMany({
       skip,
-      take: perPage,
+      take,
       orderBy: { createdAt: 'desc' },
     });
 
+    return { tweets, nextSkip, nextTake };
+  }
+
+  @Query(() => TweetsResponse)
+  async tweets(
+    @Ctx() { prisma, req }: LTContext,
+    @Arg('ids', () => [String]) ids: [string]
+  ) {
+    const { errors: newErrors } = getAuthUser(req);
+    const errors: ErrorMessage[] = [...(newErrors || [])];
+    const tweets = [];
+
+    if (errors.length) {
+      return { errors };
+    }
+
+    for (let id of ids) {
+      const tweet = await prisma.tweet.findUnique({ where: { id } });
+
+      if (tweet) {
+        tweets.push(tweet);
+      }
+    }
+
     return { tweets };
+  }
+
+  @Query(() => TweetsResponse)
+  async userTweets(
+    @Ctx() { prisma, req }: LTContext,
+    @Arg('params') params: UserTweetsParams
+  ) {
+    const { errors: newErrors } = getAuthUser(req);
+    const errors: ErrorMessage[] = [...(newErrors || [])];
+
+    if (errors.length) {
+      return { errors };
+    }
+
+    const skip = params.skip || 0;
+    const take = params.take || 10;
+
+    const tweetsCount = await prisma.tweet.count({ where: { userId: params.userId } });
+    const nextSkip = skip + take;
+    const nextTake = tweetsCount > nextSkip ? take : null;
+
+    const tweets = await prisma.tweet.findMany({
+      skip,
+      take,
+      orderBy: { createdAt: 'desc' },
+      where: { userId: params.userId }
+    });
+
+    return { tweets, nextSkip, nextTake };
   }
 
   @FieldResolver(() => User)
@@ -257,5 +316,18 @@ export default class TweetResolver {
     });
 
     return vote ? true : false;
+  }
+
+  // ------------------------------------------------------ SUBSCIPTIONS ------------------------------------------------------
+  @Subscription(() => TweetSubscriptionResponse, { topics: 'FEED_NOTIFICATIONS' })
+  // async feedNotifications(@Root() tweet: Tweet, @Arg('token') token: string) {
+  async feedNotifications(@Root() tweet: Tweet) {
+    // const { errors: newErrors } = getAuthUser(token);
+    // const errors: ErrorMessage[] = [...(newErrors || [])];
+
+    // if (errors.length) {
+    //   return { errors };
+    // }
+    return { tweetId: tweet.id };
   }
 }

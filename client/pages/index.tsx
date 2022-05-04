@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import type { NextPage, NextPageContext } from 'next';
-import { Box, Container } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 
 import CreateClient from '../utils/CreateClient';
 import { FeedDocument, Tweet } from '../graphql/generated/graphql';
@@ -34,7 +34,7 @@ export async function getServerSideProps(context: NextPageContext) {
     variables: {
       params: {
         page: 1,
-        perPage: 4,
+        perPage: 10,
       },
     },
   });

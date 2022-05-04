@@ -86,7 +86,7 @@ export const catchUserErrors = (error: any): ErrorMessage[] => {
   return errors;
 };
 
-export const getAuthUser = (req: LTSession): ValidatedUser => {
+export const getAuthUser = (req: LTSession | string): ValidatedUser => {
   const errors: ErrorMessage[] = [];
   let userId;
   let token;
@@ -105,7 +105,7 @@ export const getAuthUser = (req: LTSession): ValidatedUser => {
   }
 
   try {
-    token = req.session.token || req.headers.authorization;
+    token = typeof req === 'string' ? req : req.session.token || req.headers.authorization;
 
     if (!token) {
       errors.push({
@@ -126,7 +126,7 @@ export const getAuthUser = (req: LTSession): ValidatedUser => {
 
 export const getTagsAndMentions = (
   text: string
-): { hashtags: string[]; mentions: string[] } => {
+): { hashtags: string[]; mentions: string[]; } => {
   return {
     hashtags: text.match(/\B\#\w\w+\b/g) || [],
     mentions: text.match(/\B\@\w\w+\b/g)?.map(m => m.replace('@', '')) || [],

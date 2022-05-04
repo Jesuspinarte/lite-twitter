@@ -1,0 +1,10 @@
+subscription FeedNotifications {
+  feedNotifications {
+    errors {
+      field
+      message
+      type
+    }
+    tweetId
+  }
+}
