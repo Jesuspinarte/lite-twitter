@@ -3,14 +3,10 @@ import type { NextPage, NextPageContext } from 'next';
 import { Box } from '@chakra-ui/react';
 
 import CreateClient from '../utils/CreateClient';
-import { FeedDocument, Tweet } from '../graphql/generated/graphql';
-import Feed from '../components/feed/Feed';
+import { FeedDocument } from '../graphql/generated/graphql';
+import Feed, { FeedProps } from '../components/feed/Feed';
 
-interface FeedProps {
-  tweets: Tweet[];
-}
-
-const Home: NextPage<FeedProps> = ({ tweets }) => {
+const Home: NextPage<FeedProps> = props => {
   return (
     <Box>
       <Head>
@@ -21,7 +17,7 @@ const Home: NextPage<FeedProps> = ({ tweets }) => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Feed tweets={tweets} />
+      <Feed {...props} />
     </Box>
   );
 };
@@ -33,15 +29,15 @@ export async function getServerSideProps(context: NextPageContext) {
     query: FeedDocument,
     variables: {
       params: {
-        page: 1,
-        perPage: 10,
+        skip: 0,
+        take: 4,
       },
     },
   });
 
   return {
     props: {
-      ...(data.feed || []),
+      ...(data.feed || { tweets: [], nextSkip: null, nextTake: null }),
     },
   };
 }

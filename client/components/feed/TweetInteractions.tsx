@@ -9,6 +9,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Text,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
@@ -26,17 +27,25 @@ import TweetForm from './TweetForm';
 import TweetData from './TweetData';
 
 const TweetInteractions: React.FC<Tweet> = props => {
-  const { id, hasVote } = props;
+  const {
+    id,
+    hasVote,
+    votesCount: tweetVotes,
+    commentsCount: tweetComments,
+  } = props;
 
   const [hasVoted, setHasVoted] = useState(hasVote);
   const [isLoadingVote, setIsLoadingVote] = useState(false);
+
+  const [votesCount, setVotesCount] = useState(tweetVotes);
+  const [commentsCount, setCommentsCount] = useState(tweetComments);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
   const [voteForTweet] = useVoteMutation({
     variables: { tweetId: id },
-    onCompleted: ({ vote }) => {
-      if (!vote.errors) {
+    onCompleted: ({ vote: { errors, vote } }) => {
+      if (!errors) {
         toast({
           title: 'Tweet voted!',
           position: 'bottom',
@@ -44,6 +53,11 @@ const TweetInteractions: React.FC<Tweet> = props => {
           status: 'success',
         });
         setHasVoted(true);
+
+        if (vote) {
+          setCommentsCount(vote.tweet.commentsCount);
+          setVotesCount(vote.tweet.votesCount);
+        }
       } else {
         toast({
           title: 'There was an unexpected error',
@@ -57,8 +71,8 @@ const TweetInteractions: React.FC<Tweet> = props => {
 
   const [unvoteForTweet] = useUnvoteMutation({
     variables: { tweetId: id },
-    onCompleted: ({ unvote }) => {
-      if (!unvote.errors) {
+    onCompleted: ({ unvote: { errors, vote } }) => {
+      if (!errors) {
         toast({
           title: 'Tweet unvoted!',
           position: 'bottom',
@@ -66,6 +80,11 @@ const TweetInteractions: React.FC<Tweet> = props => {
           status: 'info',
         });
         setHasVoted(false);
+
+        if (vote) {
+          setCommentsCount(vote.tweet.commentsCount);
+          setVotesCount(vote.tweet.votesCount);
+        }
       } else {
         toast({
           title: 'There was an unexpected error',
@@ -79,61 +98,97 @@ const TweetInteractions: React.FC<Tweet> = props => {
 
   return (
     <Box display="flex" justifyContent="space-around" mt={4} fontSize={22}>
-      <IconButton
-        aria-label="comment"
-        icon={<MdOutlineModeComment />}
-        variant="ghost"
-        size="lg"
-        isRound
+      <Button
+        fontSize={11}
         colorScheme="teal"
-        h={8}
-        w={8}
-        minW={8}
-        _focus={{ outline: 'none' }}
+        variant="ghost"
+        _focus={{ outline: 'none', bgColor: 'transparent' }}
+        _hover={{ bgColor: 'transparent' }}
+        as="div"
         onClick={onOpen}
-      />
-      {hasVoted ? (
+      >
         <IconButton
-          aria-label="vote"
-          icon={<IoMdHeart />}
+          aria-label="comment"
+          icon={<MdOutlineModeComment />}
           variant="ghost"
           size="lg"
           isRound
-          colorScheme="red"
+          colorScheme="teal"
           h={8}
           w={8}
           minW={8}
+          mr={2}
           _focus={{ outline: 'none' }}
+          onClick={onOpen}
+        />
+        {commentsCount}
+      </Button>
+      {hasVoted ? (
+        <Button
+          fontSize={11}
+          colorScheme="red"
+          variant="ghost"
+          _focus={{ outline: 'none' }}
+          _hover={{ bgColor: 'transparent' }}
+          as="div"
           isLoading={isLoadingVote}
           onClick={async () => {
             setIsLoadingVote(true);
             await unvoteForTweet();
             setIsLoadingVote(false);
           }}
-        />
+        >
+          <IconButton
+            aria-label="vote"
+            icon={<IoMdHeart />}
+            variant="ghost"
+            size="lg"
+            isRound
+            colorScheme="red"
+            h={8}
+            w={8}
+            minW={8}
+            mr={2}
+            _focus={{ outline: 'none', bgColor: 'transparent' }}
+            disabled={isLoadingVote}
+          />
+          {votesCount}
+        </Button>
       ) : (
-        <IconButton
-          aria-label="vote"
-          icon={<IoMdHeartEmpty />}
-          variant="ghost"
-          size="lg"
-          isRound
+        <Button
+          fontSize={11}
           colorScheme="red"
-          h={8}
-          w={8}
-          minW={8}
+          variant="ghost"
+          _focus={{ outline: 'none', bgColor: 'transparent' }}
+          _hover={{ bgColor: 'transparent' }}
+          as="div"
           isLoading={isLoadingVote}
-          _focus={{ outline: 'none' }}
           onClick={async () => {
             setIsLoadingVote(true);
             await voteForTweet();
             setIsLoadingVote(false);
           }}
-        />
+        >
+          <IconButton
+            aria-label="vote"
+            icon={<IoMdHeartEmpty />}
+            variant="ghost"
+            size="lg"
+            isRound
+            colorScheme="red"
+            h={8}
+            w={8}
+            minW={8}
+            mr={2}
+            _focus={{ outline: 'none' }}
+            disabled={isLoadingVote}
+          />
+          {votesCount}
+        </Button>
       )}
       <Modal onClose={onClose} isOpen={isOpen} isCentered size="xl">
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent borderRadius={6} overflow="hidden">
           <ModalCloseButton />
           <ModalBody pr={0} pl={0} pt={8} pb={0}>
             <Box p={4} pb={8}>

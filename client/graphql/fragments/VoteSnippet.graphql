@@ -5,5 +5,7 @@ fragment VoteInfo on Vote {
   }
   tweet {
     text
+    commentsCount
+    votesCount
   }
 }

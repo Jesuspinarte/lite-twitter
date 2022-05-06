@@ -1,10 +1,8 @@
-query Feed($params: TweetParams!) {
-  feed(params: $params) {
+query Tweets($ids: [String!]!) {
+  tweets(ids: $ids) {
     errors {
       ...FullErrorInfo
     }
-    nextSkip
-    nextTake
     tweets {
       ...TweetInfo
       tweet {

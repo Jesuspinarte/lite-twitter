@@ -23,6 +23,15 @@ export type Scalars = {
   DateTime: any;
 };
 
+export type CommentsResponse = {
+  __typename?: 'CommentsResponse';
+  comments?: Maybe<Array<Tweet>>;
+  errors?: Maybe<Array<ErrorMessage>>;
+  nextSkip?: Maybe<Scalars['Float']>;
+  nextTake?: Maybe<Scalars['Float']>;
+  tweet?: Maybe<Tweet>;
+};
+
 export type ErrorMessage = {
   __typename?: 'ErrorMessage';
   field?: Maybe<Scalars['String']>;
@@ -38,7 +47,6 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   postTweet: TweetResponse;
   register: UserResponse;
-  sendMessage: Scalars['String'];
   unvote: VoteResponse;
   updateUserInfo: UserResponse;
   vote: VoteResponse;
@@ -64,10 +72,6 @@ export type MutationRegisterArgs = {
   user: UserInput;
 };
 
-export type MutationSendMessageArgs = {
-  message: Scalars['String'];
-};
-
 export type MutationUnvoteArgs = {
   tweetId: Scalars['String'];
 };
@@ -89,6 +93,10 @@ export type Query = {
   __typename?: 'Query';
   currentUser: UserResponse;
   feed: TweetsResponse;
+  tweetComments: CommentsResponse;
+  tweets: TweetsResponse;
+  user: UserResponse;
+  userTweets: TweetsResponse;
   userVotes: VotesResponse;
 };
 
@@ -96,10 +104,25 @@ export type QueryFeedArgs = {
   params?: InputMaybe<TweetParams>;
 };
 
+export type QueryTweetCommentsArgs = {
+  params: TweetCommentsParams;
+};
+
+export type QueryTweetsArgs = {
+  ids: Array<Scalars['String']>;
+};
+
+export type QueryUserArgs = {
+  username: Scalars['String'];
+};
+
+export type QueryUserTweetsArgs = {
+  params: UserTweetsParams;
+};
+
 export type Subscription = {
   __typename?: 'Subscription';
   feedNotifications: TweetSubscriptionResponse;
-  receiveMessage: Scalars['String'];
 };
 
 export type Tweet = {
@@ -118,14 +141,20 @@ export type Tweet = {
   votesCount: Scalars['Float'];
 };
 
+export type TweetCommentsParams = {
+  skip?: InputMaybe<Scalars['Float']>;
+  take?: InputMaybe<Scalars['Float']>;
+  tweetId: Scalars['String'];
+};
+
 export type TweetInput = {
   text: Scalars['String'];
   tweetId?: InputMaybe<Scalars['String']>;
 };
 
 export type TweetParams = {
-  page?: InputMaybe<Scalars['Float']>;
-  perPage?: InputMaybe<Scalars['Float']>;
+  skip?: InputMaybe<Scalars['Float']>;
+  take?: InputMaybe<Scalars['Float']>;
 };
 
 export type TweetResponse = {
@@ -143,6 +172,8 @@ export type TweetSubscriptionResponse = {
 export type TweetsResponse = {
   __typename?: 'TweetsResponse';
   errors?: Maybe<Array<ErrorMessage>>;
+  nextSkip?: Maybe<Scalars['Float']>;
+  nextTake?: Maybe<Scalars['Float']>;
   tweets?: Maybe<Array<Tweet>>;
 };
 
@@ -180,6 +211,12 @@ export type UserResponse = {
   errors?: Maybe<Array<ErrorMessage>>;
   token?: Maybe<Scalars['String']>;
   user?: Maybe<User>;
+};
+
+export type UserTweetsParams = {
+  skip?: InputMaybe<Scalars['Float']>;
+  take?: InputMaybe<Scalars['Float']>;
+  username: Scalars['String'];
 };
 
 export type Vote = {
@@ -246,7 +283,12 @@ export type VoteInfoFragment = {
   __typename?: 'Vote';
   id: string;
   user: { __typename?: 'User'; name: string };
-  tweet: { __typename?: 'Tweet'; text: string };
+  tweet: {
+    __typename?: 'Tweet';
+    text: string;
+    commentsCount: number;
+    votesCount: number;
+  };
 };
 
 export type PostTweetMutationVariables = Exact<{
@@ -337,7 +379,12 @@ export type UnvoteMutation = {
       __typename?: 'Vote';
       id: string;
       user: { __typename?: 'User'; name: string };
-      tweet: { __typename?: 'Tweet'; text: string };
+      tweet: {
+        __typename?: 'Tweet';
+        text: string;
+        commentsCount: number;
+        votesCount: number;
+      };
     } | null;
   };
 };
@@ -360,7 +407,12 @@ export type VoteMutation = {
       __typename?: 'Vote';
       id: string;
       user: { __typename?: 'User'; name: string };
-      tweet: { __typename?: 'Tweet'; text: string };
+      tweet: {
+        __typename?: 'Tweet';
+        text: string;
+        commentsCount: number;
+        votesCount: number;
+      };
     } | null;
   };
 };
@@ -373,6 +425,141 @@ export type FeedQuery = {
   __typename?: 'Query';
   feed: {
     __typename?: 'TweetsResponse';
+    nextSkip?: number | null;
+    nextTake?: number | null;
+    errors?: Array<{
+      __typename?: 'ErrorMessage';
+      field?: string | null;
+      message: string;
+      type?: string | null;
+    }> | null;
+    tweets?: Array<{
+      __typename?: 'Tweet';
+      id: string;
+      text: string;
+      votesCount: number;
+      commentsCount: number;
+      hashtags: Array<string>;
+      createdAt: any;
+      hasVote: boolean;
+      tweet?: {
+        __typename?: 'Tweet';
+        id: string;
+        text: string;
+        votesCount: number;
+        commentsCount: number;
+        hashtags: Array<string>;
+        createdAt: any;
+        hasVote: boolean;
+        user: {
+          __typename?: 'User';
+          id: string;
+          name: string;
+          username: string;
+        };
+        mentions: Array<{
+          __typename?: 'User';
+          id: string;
+          username: string;
+          name: string;
+        }>;
+      } | null;
+      user: { __typename?: 'User'; id: string; name: string; username: string };
+      mentions: Array<{
+        __typename?: 'User';
+        id: string;
+        username: string;
+        name: string;
+      }>;
+    }> | null;
+  };
+};
+
+export type TweetCommentsQueryVariables = Exact<{
+  params: TweetCommentsParams;
+}>;
+
+export type TweetCommentsQuery = {
+  __typename?: 'Query';
+  tweetComments: {
+    __typename?: 'CommentsResponse';
+    nextSkip?: number | null;
+    nextTake?: number | null;
+    errors?: Array<{
+      __typename?: 'ErrorMessage';
+      field?: string | null;
+      message: string;
+      type?: string | null;
+    }> | null;
+  };
+};
+
+export type TweetsQueryVariables = Exact<{
+  ids: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+export type TweetsQuery = {
+  __typename?: 'Query';
+  tweets: {
+    __typename?: 'TweetsResponse';
+    errors?: Array<{
+      __typename?: 'ErrorMessage';
+      field?: string | null;
+      message: string;
+      type?: string | null;
+    }> | null;
+    tweets?: Array<{
+      __typename?: 'Tweet';
+      id: string;
+      text: string;
+      votesCount: number;
+      commentsCount: number;
+      hashtags: Array<string>;
+      createdAt: any;
+      hasVote: boolean;
+      tweet?: {
+        __typename?: 'Tweet';
+        id: string;
+        text: string;
+        votesCount: number;
+        commentsCount: number;
+        hashtags: Array<string>;
+        createdAt: any;
+        hasVote: boolean;
+        user: {
+          __typename?: 'User';
+          id: string;
+          name: string;
+          username: string;
+        };
+        mentions: Array<{
+          __typename?: 'User';
+          id: string;
+          username: string;
+          name: string;
+        }>;
+      } | null;
+      user: { __typename?: 'User'; id: string; name: string; username: string };
+      mentions: Array<{
+        __typename?: 'User';
+        id: string;
+        username: string;
+        name: string;
+      }>;
+    }> | null;
+  };
+};
+
+export type UserTweetsQueryVariables = Exact<{
+  params: UserTweetsParams;
+}>;
+
+export type UserTweetsQuery = {
+  __typename?: 'Query';
+  userTweets: {
+    __typename?: 'TweetsResponse';
+    nextSkip?: number | null;
+    nextTake?: number | null;
     errors?: Array<{
       __typename?: 'ErrorMessage';
       field?: string | null;
@@ -426,6 +613,31 @@ export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 export type CurrentUserQuery = {
   __typename?: 'Query';
   currentUser: {
+    __typename?: 'UserResponse';
+    errors?: Array<{
+      __typename?: 'ErrorMessage';
+      field?: string | null;
+      message: string;
+      type?: string | null;
+    }> | null;
+    user?: {
+      __typename?: 'User';
+      id: string;
+      name: string;
+      username: string;
+      email: string;
+      createdAt: any;
+    } | null;
+  };
+};
+
+export type UserQueryVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+export type UserQuery = {
+  __typename?: 'Query';
+  user: {
     __typename?: 'UserResponse';
     errors?: Array<{
       __typename?: 'ErrorMessage';
@@ -513,6 +725,8 @@ export const VoteInfoFragmentDoc = gql`
     }
     tweet {
       text
+      commentsCount
+      votesCount
     }
   }
 `;
@@ -835,6 +1049,8 @@ export const FeedDocument = gql`
       errors {
         ...FullErrorInfo
       }
+      nextSkip
+      nextTake
       tweets {
         ...TweetInfo
         tweet {
@@ -881,6 +1097,195 @@ export function useFeedLazyQuery(
 export type FeedQueryHookResult = ReturnType<typeof useFeedQuery>;
 export type FeedLazyQueryHookResult = ReturnType<typeof useFeedLazyQuery>;
 export type FeedQueryResult = Apollo.QueryResult<FeedQuery, FeedQueryVariables>;
+export const TweetCommentsDocument = gql`
+  query TweetComments($params: TweetCommentsParams!) {
+    tweetComments(params: $params) {
+      errors {
+        ...FullErrorInfo
+      }
+      nextSkip
+      nextTake
+    }
+  }
+  ${FullErrorInfoFragmentDoc}
+`;
+
+/**
+ * __useTweetCommentsQuery__
+ *
+ * To run a query within a React component, call `useTweetCommentsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTweetCommentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTweetCommentsQuery({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useTweetCommentsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    TweetCommentsQuery,
+    TweetCommentsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<TweetCommentsQuery, TweetCommentsQueryVariables>(
+    TweetCommentsDocument,
+    options
+  );
+}
+export function useTweetCommentsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    TweetCommentsQuery,
+    TweetCommentsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<TweetCommentsQuery, TweetCommentsQueryVariables>(
+    TweetCommentsDocument,
+    options
+  );
+}
+export type TweetCommentsQueryHookResult = ReturnType<
+  typeof useTweetCommentsQuery
+>;
+export type TweetCommentsLazyQueryHookResult = ReturnType<
+  typeof useTweetCommentsLazyQuery
+>;
+export type TweetCommentsQueryResult = Apollo.QueryResult<
+  TweetCommentsQuery,
+  TweetCommentsQueryVariables
+>;
+export const TweetsDocument = gql`
+  query Tweets($ids: [String!]!) {
+    tweets(ids: $ids) {
+      errors {
+        ...FullErrorInfo
+      }
+      tweets {
+        ...TweetInfo
+        tweet {
+          ...TweetInfo
+        }
+      }
+    }
+  }
+  ${FullErrorInfoFragmentDoc}
+  ${TweetInfoFragmentDoc}
+`;
+
+/**
+ * __useTweetsQuery__
+ *
+ * To run a query within a React component, call `useTweetsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTweetsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTweetsQuery({
+ *   variables: {
+ *      ids: // value for 'ids'
+ *   },
+ * });
+ */
+export function useTweetsQuery(
+  baseOptions: Apollo.QueryHookOptions<TweetsQuery, TweetsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<TweetsQuery, TweetsQueryVariables>(
+    TweetsDocument,
+    options
+  );
+}
+export function useTweetsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<TweetsQuery, TweetsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<TweetsQuery, TweetsQueryVariables>(
+    TweetsDocument,
+    options
+  );
+}
+export type TweetsQueryHookResult = ReturnType<typeof useTweetsQuery>;
+export type TweetsLazyQueryHookResult = ReturnType<typeof useTweetsLazyQuery>;
+export type TweetsQueryResult = Apollo.QueryResult<
+  TweetsQuery,
+  TweetsQueryVariables
+>;
+export const UserTweetsDocument = gql`
+  query UserTweets($params: UserTweetsParams!) {
+    userTweets(params: $params) {
+      errors {
+        ...FullErrorInfo
+      }
+      nextSkip
+      nextTake
+      tweets {
+        ...TweetInfo
+        tweet {
+          ...TweetInfo
+        }
+      }
+    }
+  }
+  ${FullErrorInfoFragmentDoc}
+  ${TweetInfoFragmentDoc}
+`;
+
+/**
+ * __useUserTweetsQuery__
+ *
+ * To run a query within a React component, call `useUserTweetsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserTweetsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserTweetsQuery({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useUserTweetsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    UserTweetsQuery,
+    UserTweetsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UserTweetsQuery, UserTweetsQueryVariables>(
+    UserTweetsDocument,
+    options
+  );
+}
+export function useUserTweetsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UserTweetsQuery,
+    UserTweetsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UserTweetsQuery, UserTweetsQueryVariables>(
+    UserTweetsDocument,
+    options
+  );
+}
+export type UserTweetsQueryHookResult = ReturnType<typeof useUserTweetsQuery>;
+export type UserTweetsLazyQueryHookResult = ReturnType<
+  typeof useUserTweetsLazyQuery
+>;
+export type UserTweetsQueryResult = Apollo.QueryResult<
+  UserTweetsQuery,
+  UserTweetsQueryVariables
+>;
 export const CurrentUserDocument = gql`
   query CurrentUser {
     currentUser {
@@ -943,6 +1348,55 @@ export type CurrentUserQueryResult = Apollo.QueryResult<
   CurrentUserQuery,
   CurrentUserQueryVariables
 >;
+export const UserDocument = gql`
+  query User($username: String!) {
+    user(username: $username) {
+      errors {
+        ...FullErrorInfo
+      }
+      user {
+        ...UserInfo
+      }
+    }
+  }
+  ${FullErrorInfoFragmentDoc}
+  ${UserInfoFragmentDoc}
+`;
+
+/**
+ * __useUserQuery__
+ *
+ * To run a query within a React component, call `useUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserQuery({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useUserQuery(
+  baseOptions: Apollo.QueryHookOptions<UserQuery, UserQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UserQuery, UserQueryVariables>(UserDocument, options);
+}
+export function useUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<UserQuery, UserQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UserQuery, UserQueryVariables>(
+    UserDocument,
+    options
+  );
+}
+export type UserQueryHookResult = ReturnType<typeof useUserQuery>;
+export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
+export type UserQueryResult = Apollo.QueryResult<UserQuery, UserQueryVariables>;
 export const FeedNotificationsDocument = gql`
   subscription FeedNotifications {
     feedNotifications {

@@ -21,7 +21,19 @@ export class TweetParams {
 @InputType()
 export class UserTweetsParams {
   @Field()
-  userId: string;
+  username: string;
+
+  @Field({ nullable: true })
+  skip?: number;
+
+  @Field({ nullable: true })
+  take?: number;
+}
+
+@InputType()
+export class TweetCommentsParams {
+  @Field()
+  tweetId: string;
 
   @Field({ nullable: true })
   skip?: number;

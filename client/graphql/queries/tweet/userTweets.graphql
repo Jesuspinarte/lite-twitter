@@ -1,5 +1,5 @@
-query Feed($params: TweetParams!) {
-  feed(params: $params) {
+query UserTweets($params: UserTweetsParams!) {
+  userTweets(params: $params) {
     errors {
       ...FullErrorInfo
     }

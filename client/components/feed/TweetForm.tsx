@@ -105,7 +105,6 @@ const TweetForm: React.FC<TweetFormProps> = ({
       p={4}
       pt={8}
       backgroundColor={bgColor}
-      borderTopRadius={6}
       textAlign="right"
       onSubmit={handleSubmit}
       onKeyDown={handleCtrlEnter}

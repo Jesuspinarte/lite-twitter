@@ -1,5 +1,5 @@
-import Tweet, { TweetResponse, TweetsResponse, TweetSubscriptionResponse } from '../entities/Tweet';
-import TweetInput, { TweetParams, UserTweetsParams } from '../inputs/TweetInput';
+import Tweet, { CommentsResponse, TweetResponse, TweetsResponse, TweetSubscriptionResponse } from '../entities/Tweet';
+import TweetInput, { TweetCommentsParams, TweetParams, UserTweetsParams } from '../inputs/TweetInput';
 import { LTContext } from '../utils/types';
 import {
   Arg,
@@ -157,6 +157,9 @@ export default class TweetResolver {
   ) {
     const { errors: newErrors } = getAuthUser(req);
     const errors: ErrorMessage[] = [...(newErrors || [])];
+    let nextSkip;
+    let nextTake;
+    let tweets;
 
     if (errors.length) {
       return { errors };
@@ -165,15 +168,26 @@ export default class TweetResolver {
     const skip = params?.skip || 0;
     const take = params?.take || 10;
 
-    const tweetsCount = await prisma.tweet.count();
-    const nextSkip = skip + take;
-    const nextTake = tweetsCount > nextSkip ? take : null;
+    try {
+      const tweetsCount = await prisma.tweet.count();
 
-    const tweets = await prisma.tweet.findMany({
-      skip,
-      take,
-      orderBy: { createdAt: 'desc' },
-    });
+      nextSkip = skip + take;
+      nextTake = tweetsCount > nextSkip ? take : null;
+
+      tweets = await prisma.tweet.findMany({
+        skip,
+        take,
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (error) {
+      errors.push({
+        type: error.name,
+        message: error.message,
+      });
+
+      return { errors };
+    }
+
 
     return { tweets, nextSkip, nextTake };
   }
@@ -191,12 +205,21 @@ export default class TweetResolver {
       return { errors };
     }
 
-    for (let id of ids) {
-      const tweet = await prisma.tweet.findUnique({ where: { id } });
+    try {
+      for (let id of ids) {
+        const tweet = await prisma.tweet.findUnique({ where: { id } });
 
-      if (tweet) {
-        tweets.push(tweet);
+        if (tweet) {
+          tweets.push(tweet);
+        }
       }
+    } catch (error) {
+      errors.push({
+        type: error.name,
+        message: error.message,
+      });
+
+      return { errors };
     }
 
     return { tweets };
@@ -209,6 +232,9 @@ export default class TweetResolver {
   ) {
     const { errors: newErrors } = getAuthUser(req);
     const errors: ErrorMessage[] = [...(newErrors || [])];
+    let nextSkip;
+    let nextTake;
+    let tweets;
 
     if (errors.length) {
       return { errors };
@@ -217,18 +243,114 @@ export default class TweetResolver {
     const skip = params.skip || 0;
     const take = params.take || 10;
 
-    const tweetsCount = await prisma.tweet.count({ where: { userId: params.userId } });
-    const nextSkip = skip + take;
-    const nextTake = tweetsCount > nextSkip ? take : null;
+    try {
 
-    const tweets = await prisma.tweet.findMany({
-      skip,
-      take,
-      orderBy: { createdAt: 'desc' },
-      where: { userId: params.userId }
-    });
+      const user = await prisma.user.findFirst({
+        where: {
+          username: {
+            contains: params.username, mode: 'insensitive'
+          }
+        }
+      });
+
+      if (!user) {
+        errors.push({
+          type: 'user',
+          message: 'There was no user associated with the username.',
+        });
+
+        return { errors };
+      }
+
+      const tweetsCount = await prisma.tweet.count({
+        where: {
+          user: {
+            username: {
+              contains: params.username, mode: 'insensitive'
+            }
+          }
+        }
+      });
+      nextSkip = skip + take;
+      nextTake = tweetsCount > nextSkip ? take : null;
+
+      tweets = await prisma.tweet.findMany({
+        skip,
+        take,
+        orderBy: { createdAt: 'desc' },
+        where: {
+          user: {
+            username: {
+              contains: params.username, mode: 'insensitive'
+            }
+          }
+        }
+      });
+    } catch (error) {
+      errors.push({
+        type: error.name,
+        message: error.message,
+      });
+
+      return { errors };
+    }
 
     return { tweets, nextSkip, nextTake };
+  }
+
+  @Query(() => CommentsResponse)
+  async tweetComments(
+    @Ctx() { prisma, req }: LTContext,
+    @Arg('params') params: TweetCommentsParams
+  ) {
+    const { errors: newErrors } = getAuthUser(req);
+    const errors: ErrorMessage[] = [...(newErrors || [])];
+    let nextSkip;
+    let nextTake;
+    let comments;
+    let tweet;
+
+    if (errors.length) {
+      return { errors };
+    }
+
+    const skip = params.skip || 0;
+    const take = params.take || 10;
+
+    try {
+      const tweet = await prisma.tweet.findUnique({
+        where: { id: params.tweetId }
+      });
+
+      if (!tweet) {
+        errors.push({
+          type: 'tweet',
+          message: 'The tweet was not found. It has never existed or it was deleted.',
+        });
+
+        return { errors };
+      }
+
+      const tweetsCount = await prisma.tweet.count({ where: { tweetId: params.tweetId } });
+      nextSkip = skip + take;
+      nextTake = tweetsCount > nextSkip ? take : null;
+
+      comments = await prisma.tweet.findMany({
+        skip,
+        take,
+        orderBy: { createdAt: 'desc' },
+        where: { tweetId: params.tweetId }
+      });
+    } catch (error) {
+      errors.push({
+        type: error.name,
+        message: error.message,
+      });
+
+      return { errors };
+    }
+
+    return { tweet, comments, nextSkip, nextTake };
   }
 
   @FieldResolver(() => User)

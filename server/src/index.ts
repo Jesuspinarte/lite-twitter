@@ -115,8 +115,6 @@ async function main() {
 
   server.applyMiddleware({ app, cors: false });
 
-  // console.log(httpServer.);
-
   httpServer.listen(parseInt(process.env.PORT || '4000'), () => {
     console.log(
       `🌐 Server started on https://localhost:${process.env.PORT || 4000}${server.graphqlPath}`

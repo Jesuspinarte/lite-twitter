@@ -80,3 +80,20 @@ export class TweetSubscriptionResponse {
   tweetId?: string;
 }
 
+@ObjectType()
+export class CommentsResponse {
+  @Field(() => [ErrorMessage], { nullable: true })
+  errors?: ErrorMessage[];
+
+  @Field(() => Tweet, { nullable: true })
+  tweet?: Tweet;
+
+  @Field(() => [Tweet], { nullable: true })
+  comments?: Tweet[];
+
+  @Field({ nullable: true })
+  nextSkip?: number;
+
+  @Field({ nullable: true })
+  nextTake?: number;
+}

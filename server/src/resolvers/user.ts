@@ -248,6 +248,7 @@ export default class UserResolver {
     const { userId, errors: newErrors } = getAuthUser(req);
     const errors: ErrorMessage[] = [...(newErrors || [])];
     let user;
+
     if (errors.length) {
       return { errors };
     }
@@ -268,6 +269,51 @@ export default class UserResolver {
         errors.push({
           type: 'session',
           message: 'No user was found in session.',
+        });
+        return { errors };
+      }
+    } catch (error) {
+      errors.push({
+        type: error.name,
+        message: error.message,
+      });
+
+      return { errors };
+    }
+
+    return { user };
+  }
+
+  @Query(() => UserResponse)
+  async user(@Ctx() { prisma, req }: LTContext, @Arg('username') username: string) {
+    const { errors: newErrors } = getAuthUser(req);
+    const errors: ErrorMessage[] = [...(newErrors || [])];
+    let user;
+
+    if (errors.length) {
+      return { errors };
+    }
+
+    if (!req) {
+      errors.push({
+        type: 'authorization',
+        message: 'No authenticated user found.',
+      });
+
+      return { errors };
+    }
+
+    try {
+      user = await prisma.user.findFirst({
+        where: {
+          username: { contains: username, mode: 'insensitive' }
+        }
+      });
+
+      if (!user) {
+        errors.push({
+          type: 'user',
+          message: 'There was no user associated with the username.',
         });
         return { errors };
       }

@@ -1,0 +1,9 @@
+query TweetComments($params: TweetCommentsParams!) {
+  tweetComments(params: $params) {
+    errors {
+      ...FullErrorInfo
+    }
+    nextSkip
+    nextTake
+  }
+}
