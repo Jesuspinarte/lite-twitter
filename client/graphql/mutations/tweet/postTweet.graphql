@@ -4,8 +4,10 @@ mutation PostTweet($tweet: TweetInput!) {
       ...FullErrorInfo
     }
     tweet {
-      id
-      text
+      ...TweetInfo
+      tweet {
+        commentsCount
+      }
     }
   }
 }

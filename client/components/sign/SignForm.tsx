@@ -6,7 +6,6 @@ import {
   Badge,
   Box,
   Button,
-  ButtonGroup,
   Flex,
   FormControl,
   FormHelperText,
@@ -31,8 +30,8 @@ import {
   useLoginMutation,
   User,
   useRegisterMutation,
-} from '../graphql/generated/graphql';
-import { useUserContext } from '../providers/UserProvider';
+} from '../../graphql/generated/graphql';
+import { useUserContext } from '../../providers/UserProvider';
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons';
 import { motion } from 'framer-motion';
 

@@ -318,7 +318,7 @@ export default class TweetResolver {
     const take = params.take || 10;
 
     try {
-      const tweet = await prisma.tweet.findUnique({
+      tweet = await prisma.tweet.findUnique({
         where: { id: params.tweetId }
       });
 
@@ -450,6 +450,9 @@ export default class TweetResolver {
     // if (errors.length) {
     //   return { errors };
     // }
-    return { tweetId: tweet.id };
+    return {
+      tweetId: tweet.id,
+      userId: tweet.userId
+    };
   }
 }

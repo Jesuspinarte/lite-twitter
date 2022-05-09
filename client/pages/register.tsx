@@ -9,7 +9,7 @@ import {
   VisuallyHidden,
 } from '@chakra-ui/react';
 
-import { SignForm } from '../components/SignForm';
+import { SignForm } from '../components/sign/SignForm';
 import Bird from '../components/assets/Bird';
 
 const Register: NextPage = () => {

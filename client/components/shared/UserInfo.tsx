@@ -15,7 +15,7 @@ interface UserInfoProps {
 const UserInfo: React.FC<UserInfoProps> = ({
   name,
   size,
-  username = 'md',
+  username,
   nameFontSize = 16,
   usernameFontSize = 14,
   pt = 12,

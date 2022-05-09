@@ -2,15 +2,9 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]?: Maybe<T[SubKey]>;
-};
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]: Maybe<T[SubKey]>;
-};
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -52,33 +46,41 @@ export type Mutation = {
   vote: VoteResponse;
 };
 
+
 export type MutationChangePasswordArgs = {
   password: PasswordInput;
 };
+
 
 export type MutationDeleteTweetArgs = {
   id: Scalars['String'];
 };
 
+
 export type MutationLoginArgs = {
   user: UserLoginInput;
 };
+
 
 export type MutationPostTweetArgs = {
   tweet: TweetInput;
 };
 
+
 export type MutationRegisterArgs = {
   user: UserInput;
 };
+
 
 export type MutationUnvoteArgs = {
   tweetId: Scalars['String'];
 };
 
+
 export type MutationUpdateUserInfoArgs = {
   user: UserInfo;
 };
+
 
 export type MutationVoteArgs = {
   tweetId: Scalars['String'];
@@ -100,21 +102,26 @@ export type Query = {
   userVotes: VotesResponse;
 };
 
+
 export type QueryFeedArgs = {
   params?: InputMaybe<TweetParams>;
 };
+
 
 export type QueryTweetCommentsArgs = {
   params: TweetCommentsParams;
 };
 
+
 export type QueryTweetsArgs = {
   ids: Array<Scalars['String']>;
 };
 
+
 export type QueryUserArgs = {
   username: Scalars['String'];
 };
+
 
 export type QueryUserTweetsArgs = {
   params: UserTweetsParams;
@@ -167,6 +174,7 @@ export type TweetSubscriptionResponse = {
   __typename?: 'TweetSubscriptionResponse';
   errors?: Maybe<Array<ErrorMessage>>;
   tweetId?: Maybe<Scalars['String']>;
+  userId?: Maybe<Scalars['String']>;
 };
 
 export type TweetsResponse = {
@@ -239,515 +247,181 @@ export type VotesResponse = {
   votes?: Maybe<Array<Vote>>;
 };
 
-export type ErrorInfoFragment = {
-  __typename?: 'ErrorMessage';
-  field?: string | null;
-  message: string;
-};
+export type ErrorInfoFragment = { __typename?: 'ErrorMessage', field?: string | null, message: string };
 
-export type FullErrorInfoFragment = {
-  __typename?: 'ErrorMessage';
-  field?: string | null;
-  message: string;
-  type?: string | null;
-};
+export type FullErrorInfoFragment = { __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null };
 
-export type TweetInfoFragment = {
-  __typename?: 'Tweet';
-  id: string;
-  text: string;
-  votesCount: number;
-  commentsCount: number;
-  hashtags: Array<string>;
-  createdAt: any;
-  hasVote: boolean;
-  user: { __typename?: 'User'; id: string; name: string; username: string };
-  mentions: Array<{
-    __typename?: 'User';
-    id: string;
-    username: string;
-    name: string;
-  }>;
-};
+export type TweetInfoFragment = { __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> };
 
-export type UserInfoFragment = {
-  __typename?: 'User';
-  id: string;
-  name: string;
-  username: string;
-  email: string;
-  createdAt: any;
-};
+export type UserInfoFragment = { __typename?: 'User', id: string, name: string, username: string, email: string, createdAt: any };
 
-export type VoteInfoFragment = {
-  __typename?: 'Vote';
-  id: string;
-  user: { __typename?: 'User'; name: string };
-  tweet: {
-    __typename?: 'Tweet';
-    text: string;
-    commentsCount: number;
-    votesCount: number;
-  };
-};
+export type VoteInfoFragment = { __typename?: 'Vote', id: string, user: { __typename?: 'User', name: string }, tweet: { __typename?: 'Tweet', text: string, commentsCount: number, votesCount: number } };
 
 export type PostTweetMutationVariables = Exact<{
   tweet: TweetInput;
 }>;
 
-export type PostTweetMutation = {
-  __typename?: 'Mutation';
-  postTweet: {
-    __typename?: 'TweetResponse';
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-      type?: string | null;
-    }> | null;
-    tweet?: { __typename?: 'Tweet'; id: string; text: string } | null;
-  };
-};
+
+export type PostTweetMutation = { __typename?: 'Mutation', postTweet: { __typename?: 'TweetResponse', errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null }> | null, tweet?: { __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, tweet?: { __typename?: 'Tweet', commentsCount: number } | null, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> } | null } };
 
 export type LoginMutationVariables = Exact<{
   user: UserLoginInput;
 }>;
 
-export type LoginMutation = {
-  __typename?: 'Mutation';
-  login: {
-    __typename?: 'UserResponse';
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-    }> | null;
-    user?: {
-      __typename?: 'User';
-      id: string;
-      name: string;
-      username: string;
-      email: string;
-      createdAt: any;
-    } | null;
-  };
-};
 
-export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string }> | null, user?: { __typename?: 'User', id: string, name: string, username: string, email: string, createdAt: any } | null } };
 
-export type LogoutMutation = { __typename?: 'Mutation'; logout: boolean };
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
 export type RegisterMutationVariables = Exact<{
   user: UserInput;
 }>;
 
-export type RegisterMutation = {
-  __typename?: 'Mutation';
-  register: {
-    __typename?: 'UserResponse';
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-    }> | null;
-    user?: {
-      __typename?: 'User';
-      id: string;
-      name: string;
-      username: string;
-      email: string;
-      createdAt: any;
-    } | null;
-  };
-};
+
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string }> | null, user?: { __typename?: 'User', id: string, name: string, username: string, email: string, createdAt: any } | null } };
 
 export type UnvoteMutationVariables = Exact<{
   tweetId: Scalars['String'];
 }>;
 
-export type UnvoteMutation = {
-  __typename?: 'Mutation';
-  unvote: {
-    __typename?: 'VoteResponse';
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-      type?: string | null;
-    }> | null;
-    vote?: {
-      __typename?: 'Vote';
-      id: string;
-      user: { __typename?: 'User'; name: string };
-      tweet: {
-        __typename?: 'Tweet';
-        text: string;
-        commentsCount: number;
-        votesCount: number;
-      };
-    } | null;
-  };
-};
+
+export type UnvoteMutation = { __typename?: 'Mutation', unvote: { __typename?: 'VoteResponse', errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null }> | null, vote?: { __typename?: 'Vote', id: string, user: { __typename?: 'User', name: string }, tweet: { __typename?: 'Tweet', text: string, commentsCount: number, votesCount: number } } | null } };
 
 export type VoteMutationVariables = Exact<{
   tweetId: Scalars['String'];
 }>;
 
-export type VoteMutation = {
-  __typename?: 'Mutation';
-  vote: {
-    __typename?: 'VoteResponse';
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-      type?: string | null;
-    }> | null;
-    vote?: {
-      __typename?: 'Vote';
-      id: string;
-      user: { __typename?: 'User'; name: string };
-      tweet: {
-        __typename?: 'Tweet';
-        text: string;
-        commentsCount: number;
-        votesCount: number;
-      };
-    } | null;
-  };
-};
+
+export type VoteMutation = { __typename?: 'Mutation', vote: { __typename?: 'VoteResponse', errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null }> | null, vote?: { __typename?: 'Vote', id: string, user: { __typename?: 'User', name: string }, tweet: { __typename?: 'Tweet', text: string, commentsCount: number, votesCount: number } } | null } };
 
 export type FeedQueryVariables = Exact<{
   params: TweetParams;
 }>;
 
-export type FeedQuery = {
-  __typename?: 'Query';
-  feed: {
-    __typename?: 'TweetsResponse';
-    nextSkip?: number | null;
-    nextTake?: number | null;
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-      type?: string | null;
-    }> | null;
-    tweets?: Array<{
-      __typename?: 'Tweet';
-      id: string;
-      text: string;
-      votesCount: number;
-      commentsCount: number;
-      hashtags: Array<string>;
-      createdAt: any;
-      hasVote: boolean;
-      tweet?: {
-        __typename?: 'Tweet';
-        id: string;
-        text: string;
-        votesCount: number;
-        commentsCount: number;
-        hashtags: Array<string>;
-        createdAt: any;
-        hasVote: boolean;
-        user: {
-          __typename?: 'User';
-          id: string;
-          name: string;
-          username: string;
-        };
-        mentions: Array<{
-          __typename?: 'User';
-          id: string;
-          username: string;
-          name: string;
-        }>;
-      } | null;
-      user: { __typename?: 'User'; id: string; name: string; username: string };
-      mentions: Array<{
-        __typename?: 'User';
-        id: string;
-        username: string;
-        name: string;
-      }>;
-    }> | null;
-  };
-};
+
+export type FeedQuery = { __typename?: 'Query', feed: { __typename?: 'TweetsResponse', nextSkip?: number | null, nextTake?: number | null, errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null }> | null, tweets?: Array<{ __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, tweet?: { __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> } | null, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> }> | null } };
 
 export type TweetCommentsQueryVariables = Exact<{
   params: TweetCommentsParams;
 }>;
 
-export type TweetCommentsQuery = {
-  __typename?: 'Query';
-  tweetComments: {
-    __typename?: 'CommentsResponse';
-    nextSkip?: number | null;
-    nextTake?: number | null;
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-      type?: string | null;
-    }> | null;
-  };
-};
+
+export type TweetCommentsQuery = { __typename?: 'Query', tweetComments: { __typename?: 'CommentsResponse', nextSkip?: number | null, nextTake?: number | null, errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null }> | null, tweet?: { __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> } | null, comments?: Array<{ __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> }> | null } };
+
+export type TweetWithCommentsQueryVariables = Exact<{
+  params: TweetCommentsParams;
+}>;
+
+
+export type TweetWithCommentsQuery = { __typename?: 'Query', tweetComments: { __typename?: 'CommentsResponse', nextSkip?: number | null, nextTake?: number | null, errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null }> | null, tweet?: { __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> } | null, comments?: Array<{ __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> }> | null } };
 
 export type TweetsQueryVariables = Exact<{
   ids: Array<Scalars['String']> | Scalars['String'];
 }>;
 
-export type TweetsQuery = {
-  __typename?: 'Query';
-  tweets: {
-    __typename?: 'TweetsResponse';
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-      type?: string | null;
-    }> | null;
-    tweets?: Array<{
-      __typename?: 'Tweet';
-      id: string;
-      text: string;
-      votesCount: number;
-      commentsCount: number;
-      hashtags: Array<string>;
-      createdAt: any;
-      hasVote: boolean;
-      tweet?: {
-        __typename?: 'Tweet';
-        id: string;
-        text: string;
-        votesCount: number;
-        commentsCount: number;
-        hashtags: Array<string>;
-        createdAt: any;
-        hasVote: boolean;
-        user: {
-          __typename?: 'User';
-          id: string;
-          name: string;
-          username: string;
-        };
-        mentions: Array<{
-          __typename?: 'User';
-          id: string;
-          username: string;
-          name: string;
-        }>;
-      } | null;
-      user: { __typename?: 'User'; id: string; name: string; username: string };
-      mentions: Array<{
-        __typename?: 'User';
-        id: string;
-        username: string;
-        name: string;
-      }>;
-    }> | null;
-  };
-};
+
+export type TweetsQuery = { __typename?: 'Query', tweets: { __typename?: 'TweetsResponse', errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null }> | null, tweets?: Array<{ __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, tweet?: { __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> } | null, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> }> | null } };
 
 export type UserTweetsQueryVariables = Exact<{
   params: UserTweetsParams;
 }>;
 
-export type UserTweetsQuery = {
-  __typename?: 'Query';
-  userTweets: {
-    __typename?: 'TweetsResponse';
-    nextSkip?: number | null;
-    nextTake?: number | null;
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-      type?: string | null;
-    }> | null;
-    tweets?: Array<{
-      __typename?: 'Tweet';
-      id: string;
-      text: string;
-      votesCount: number;
-      commentsCount: number;
-      hashtags: Array<string>;
-      createdAt: any;
-      hasVote: boolean;
-      tweet?: {
-        __typename?: 'Tweet';
-        id: string;
-        text: string;
-        votesCount: number;
-        commentsCount: number;
-        hashtags: Array<string>;
-        createdAt: any;
-        hasVote: boolean;
-        user: {
-          __typename?: 'User';
-          id: string;
-          name: string;
-          username: string;
-        };
-        mentions: Array<{
-          __typename?: 'User';
-          id: string;
-          username: string;
-          name: string;
-        }>;
-      } | null;
-      user: { __typename?: 'User'; id: string; name: string; username: string };
-      mentions: Array<{
-        __typename?: 'User';
-        id: string;
-        username: string;
-        name: string;
-      }>;
-    }> | null;
-  };
-};
 
-export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
+export type UserTweetsQuery = { __typename?: 'Query', userTweets: { __typename?: 'TweetsResponse', nextSkip?: number | null, nextTake?: number | null, errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null }> | null, tweets?: Array<{ __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, tweet?: { __typename?: 'Tweet', id: string, text: string, votesCount: number, commentsCount: number, hashtags: Array<string>, createdAt: any, hasVote: boolean, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> } | null, user: { __typename?: 'User', id: string, name: string, username: string }, mentions: Array<{ __typename?: 'User', id: string, username: string, name: string }> }> | null } };
 
-export type CurrentUserQuery = {
-  __typename?: 'Query';
-  currentUser: {
-    __typename?: 'UserResponse';
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-      type?: string | null;
-    }> | null;
-    user?: {
-      __typename?: 'User';
-      id: string;
-      name: string;
-      username: string;
-      email: string;
-      createdAt: any;
-    } | null;
-  };
-};
+export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CurrentUserQuery = { __typename?: 'Query', currentUser: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null }> | null, user?: { __typename?: 'User', id: string, name: string, username: string, email: string, createdAt: any } | null } };
 
 export type UserQueryVariables = Exact<{
   username: Scalars['String'];
 }>;
 
-export type UserQuery = {
-  __typename?: 'Query';
-  user: {
-    __typename?: 'UserResponse';
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-      type?: string | null;
-    }> | null;
-    user?: {
-      __typename?: 'User';
-      id: string;
-      name: string;
-      username: string;
-      email: string;
-      createdAt: any;
-    } | null;
-  };
-};
 
-export type FeedNotificationsSubscriptionVariables = Exact<{
-  [key: string]: never;
-}>;
+export type UserQuery = { __typename?: 'Query', user: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null }> | null, user?: { __typename?: 'User', id: string, name: string, username: string, email: string, createdAt: any } | null } };
 
-export type FeedNotificationsSubscription = {
-  __typename?: 'Subscription';
-  feedNotifications: {
-    __typename?: 'TweetSubscriptionResponse';
-    tweetId?: string | null;
-    errors?: Array<{
-      __typename?: 'ErrorMessage';
-      field?: string | null;
-      message: string;
-      type?: string | null;
-    }> | null;
-  };
-};
+export type FeedNotificationsSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FeedNotificationsSubscription = { __typename?: 'Subscription', feedNotifications: { __typename?: 'TweetSubscriptionResponse', tweetId?: string | null, userId?: string | null, errors?: Array<{ __typename?: 'ErrorMessage', field?: string | null, message: string, type?: string | null }> | null } };
 
 export const ErrorInfoFragmentDoc = gql`
-  fragment ErrorInfo on ErrorMessage {
-    field
-    message
-  }
-`;
+    fragment ErrorInfo on ErrorMessage {
+  field
+  message
+}
+    `;
 export const FullErrorInfoFragmentDoc = gql`
-  fragment FullErrorInfo on ErrorMessage {
-    field
-    message
-    type
-  }
-`;
+    fragment FullErrorInfo on ErrorMessage {
+  field
+  message
+  type
+}
+    `;
 export const TweetInfoFragmentDoc = gql`
-  fragment TweetInfo on Tweet {
-    id
-    text
-    votesCount
-    commentsCount
-    hashtags
-    createdAt
-    hasVote
-    user {
-      id
-      name
-      username
-    }
-    mentions {
-      id
-      username
-      name
-    }
-  }
-`;
-export const UserInfoFragmentDoc = gql`
-  fragment UserInfo on User {
+    fragment TweetInfo on Tweet {
+  id
+  text
+  votesCount
+  commentsCount
+  hashtags
+  createdAt
+  hasVote
+  user {
     id
     name
     username
-    email
-    createdAt
   }
-`;
-export const VoteInfoFragmentDoc = gql`
-  fragment VoteInfo on Vote {
+  mentions {
     id
-    user {
-      name
+    username
+    name
+  }
+}
+    `;
+export const UserInfoFragmentDoc = gql`
+    fragment UserInfo on User {
+  id
+  name
+  username
+  email
+  createdAt
+}
+    `;
+export const VoteInfoFragmentDoc = gql`
+    fragment VoteInfo on Vote {
+  id
+  user {
+    name
+  }
+  tweet {
+    text
+    commentsCount
+    votesCount
+  }
+}
+    `;
+export const PostTweetDocument = gql`
+    mutation PostTweet($tweet: TweetInput!) {
+  postTweet(tweet: $tweet) {
+    errors {
+      ...FullErrorInfo
     }
     tweet {
-      text
-      commentsCount
-      votesCount
-    }
-  }
-`;
-export const PostTweetDocument = gql`
-  mutation PostTweet($tweet: TweetInput!) {
-    postTweet(tweet: $tweet) {
-      errors {
-        ...FullErrorInfo
-      }
+      ...TweetInfo
       tweet {
-        id
-        text
+        commentsCount
       }
     }
   }
-  ${FullErrorInfoFragmentDoc}
-`;
-export type PostTweetMutationFn = Apollo.MutationFunction<
-  PostTweetMutation,
-  PostTweetMutationVariables
->;
+}
+    ${FullErrorInfoFragmentDoc}
+${TweetInfoFragmentDoc}`;
+export type PostTweetMutationFn = Apollo.MutationFunction<PostTweetMutation, PostTweetMutationVariables>;
 
 /**
  * __usePostTweetMutation__
@@ -766,44 +440,27 @@ export type PostTweetMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function usePostTweetMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    PostTweetMutation,
-    PostTweetMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<PostTweetMutation, PostTweetMutationVariables>(
-    PostTweetDocument,
-    options
-  );
-}
-export type PostTweetMutationHookResult = ReturnType<
-  typeof usePostTweetMutation
->;
+export function usePostTweetMutation(baseOptions?: Apollo.MutationHookOptions<PostTweetMutation, PostTweetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<PostTweetMutation, PostTweetMutationVariables>(PostTweetDocument, options);
+      }
+export type PostTweetMutationHookResult = ReturnType<typeof usePostTweetMutation>;
 export type PostTweetMutationResult = Apollo.MutationResult<PostTweetMutation>;
-export type PostTweetMutationOptions = Apollo.BaseMutationOptions<
-  PostTweetMutation,
-  PostTweetMutationVariables
->;
+export type PostTweetMutationOptions = Apollo.BaseMutationOptions<PostTweetMutation, PostTweetMutationVariables>;
 export const LoginDocument = gql`
-  mutation Login($user: UserLoginInput!) {
-    login(user: $user) {
-      errors {
-        ...ErrorInfo
-      }
-      user {
-        ...UserInfo
-      }
+    mutation Login($user: UserLoginInput!) {
+  login(user: $user) {
+    errors {
+      ...ErrorInfo
+    }
+    user {
+      ...UserInfo
     }
   }
-  ${ErrorInfoFragmentDoc}
-  ${UserInfoFragmentDoc}
-`;
-export type LoginMutationFn = Apollo.MutationFunction<
-  LoginMutation,
-  LoginMutationVariables
->;
+}
+    ${ErrorInfoFragmentDoc}
+${UserInfoFragmentDoc}`;
+export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
  * __useLoginMutation__
@@ -822,33 +479,19 @@ export type LoginMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useLoginMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    LoginMutation,
-    LoginMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(
-    LoginDocument,
-    options
-  );
-}
+export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
+      }
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<
-  LoginMutation,
-  LoginMutationVariables
->;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const LogoutDocument = gql`
-  mutation Logout {
-    logout
-  }
-`;
-export type LogoutMutationFn = Apollo.MutationFunction<
-  LogoutMutation,
-  LogoutMutationVariables
->;
+    mutation Logout {
+  logout
+}
+    `;
+export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
 
 /**
  * __useLogoutMutation__
@@ -866,42 +509,27 @@ export type LogoutMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useLogoutMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    LogoutMutation,
-    LogoutMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(
-    LogoutDocument,
-    options
-  );
-}
+export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
+      }
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
-export type LogoutMutationOptions = Apollo.BaseMutationOptions<
-  LogoutMutation,
-  LogoutMutationVariables
->;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
 export const RegisterDocument = gql`
-  mutation Register($user: UserInput!) {
-    register(user: $user) {
-      errors {
-        ...ErrorInfo
-      }
-      user {
-        ...UserInfo
-      }
+    mutation Register($user: UserInput!) {
+  register(user: $user) {
+    errors {
+      ...ErrorInfo
+    }
+    user {
+      ...UserInfo
     }
   }
-  ${ErrorInfoFragmentDoc}
-  ${UserInfoFragmentDoc}
-`;
-export type RegisterMutationFn = Apollo.MutationFunction<
-  RegisterMutation,
-  RegisterMutationVariables
->;
+}
+    ${ErrorInfoFragmentDoc}
+${UserInfoFragmentDoc}`;
+export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
 
 /**
  * __useRegisterMutation__
@@ -920,42 +548,27 @@ export type RegisterMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useRegisterMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RegisterMutation,
-    RegisterMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(
-    RegisterDocument,
-    options
-  );
-}
+export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, options);
+      }
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
-export type RegisterMutationOptions = Apollo.BaseMutationOptions<
-  RegisterMutation,
-  RegisterMutationVariables
->;
+export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const UnvoteDocument = gql`
-  mutation Unvote($tweetId: String!) {
-    unvote(tweetId: $tweetId) {
-      errors {
-        ...FullErrorInfo
-      }
-      vote {
-        ...VoteInfo
-      }
+    mutation Unvote($tweetId: String!) {
+  unvote(tweetId: $tweetId) {
+    errors {
+      ...FullErrorInfo
+    }
+    vote {
+      ...VoteInfo
     }
   }
-  ${FullErrorInfoFragmentDoc}
-  ${VoteInfoFragmentDoc}
-`;
-export type UnvoteMutationFn = Apollo.MutationFunction<
-  UnvoteMutation,
-  UnvoteMutationVariables
->;
+}
+    ${FullErrorInfoFragmentDoc}
+${VoteInfoFragmentDoc}`;
+export type UnvoteMutationFn = Apollo.MutationFunction<UnvoteMutation, UnvoteMutationVariables>;
 
 /**
  * __useUnvoteMutation__
@@ -974,42 +587,27 @@ export type UnvoteMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useUnvoteMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UnvoteMutation,
-    UnvoteMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UnvoteMutation, UnvoteMutationVariables>(
-    UnvoteDocument,
-    options
-  );
-}
+export function useUnvoteMutation(baseOptions?: Apollo.MutationHookOptions<UnvoteMutation, UnvoteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UnvoteMutation, UnvoteMutationVariables>(UnvoteDocument, options);
+      }
 export type UnvoteMutationHookResult = ReturnType<typeof useUnvoteMutation>;
 export type UnvoteMutationResult = Apollo.MutationResult<UnvoteMutation>;
-export type UnvoteMutationOptions = Apollo.BaseMutationOptions<
-  UnvoteMutation,
-  UnvoteMutationVariables
->;
+export type UnvoteMutationOptions = Apollo.BaseMutationOptions<UnvoteMutation, UnvoteMutationVariables>;
 export const VoteDocument = gql`
-  mutation Vote($tweetId: String!) {
-    vote(tweetId: $tweetId) {
-      errors {
-        ...FullErrorInfo
-      }
-      vote {
-        ...VoteInfo
-      }
+    mutation Vote($tweetId: String!) {
+  vote(tweetId: $tweetId) {
+    errors {
+      ...FullErrorInfo
+    }
+    vote {
+      ...VoteInfo
     }
   }
-  ${FullErrorInfoFragmentDoc}
-  ${VoteInfoFragmentDoc}
-`;
-export type VoteMutationFn = Apollo.MutationFunction<
-  VoteMutation,
-  VoteMutationVariables
->;
+}
+    ${FullErrorInfoFragmentDoc}
+${VoteInfoFragmentDoc}`;
+export type VoteMutationFn = Apollo.MutationFunction<VoteMutation, VoteMutationVariables>;
 
 /**
  * __useVoteMutation__
@@ -1028,40 +626,31 @@ export type VoteMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useVoteMutation(
-  baseOptions?: Apollo.MutationHookOptions<VoteMutation, VoteMutationVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<VoteMutation, VoteMutationVariables>(
-    VoteDocument,
-    options
-  );
-}
+export function useVoteMutation(baseOptions?: Apollo.MutationHookOptions<VoteMutation, VoteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<VoteMutation, VoteMutationVariables>(VoteDocument, options);
+      }
 export type VoteMutationHookResult = ReturnType<typeof useVoteMutation>;
 export type VoteMutationResult = Apollo.MutationResult<VoteMutation>;
-export type VoteMutationOptions = Apollo.BaseMutationOptions<
-  VoteMutation,
-  VoteMutationVariables
->;
+export type VoteMutationOptions = Apollo.BaseMutationOptions<VoteMutation, VoteMutationVariables>;
 export const FeedDocument = gql`
-  query Feed($params: TweetParams!) {
-    feed(params: $params) {
-      errors {
-        ...FullErrorInfo
-      }
-      nextSkip
-      nextTake
-      tweets {
+    query Feed($params: TweetParams!) {
+  feed(params: $params) {
+    errors {
+      ...FullErrorInfo
+    }
+    nextSkip
+    nextTake
+    tweets {
+      ...TweetInfo
+      tweet {
         ...TweetInfo
-        tweet {
-          ...TweetInfo
-        }
       }
     }
   }
-  ${FullErrorInfoFragmentDoc}
-  ${TweetInfoFragmentDoc}
-`;
+}
+    ${FullErrorInfoFragmentDoc}
+${TweetInfoFragmentDoc}`;
 
 /**
  * __useFeedQuery__
@@ -1079,36 +668,35 @@ export const FeedDocument = gql`
  *   },
  * });
  */
-export function useFeedQuery(
-  baseOptions: Apollo.QueryHookOptions<FeedQuery, FeedQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<FeedQuery, FeedQueryVariables>(FeedDocument, options);
-}
-export function useFeedLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<FeedQuery, FeedQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<FeedQuery, FeedQueryVariables>(
-    FeedDocument,
-    options
-  );
-}
+export function useFeedQuery(baseOptions: Apollo.QueryHookOptions<FeedQuery, FeedQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FeedQuery, FeedQueryVariables>(FeedDocument, options);
+      }
+export function useFeedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FeedQuery, FeedQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FeedQuery, FeedQueryVariables>(FeedDocument, options);
+        }
 export type FeedQueryHookResult = ReturnType<typeof useFeedQuery>;
 export type FeedLazyQueryHookResult = ReturnType<typeof useFeedLazyQuery>;
 export type FeedQueryResult = Apollo.QueryResult<FeedQuery, FeedQueryVariables>;
 export const TweetCommentsDocument = gql`
-  query TweetComments($params: TweetCommentsParams!) {
-    tweetComments(params: $params) {
-      errors {
-        ...FullErrorInfo
-      }
-      nextSkip
-      nextTake
+    query TweetComments($params: TweetCommentsParams!) {
+  tweetComments(params: $params) {
+    errors {
+      ...FullErrorInfo
+    }
+    nextSkip
+    nextTake
+    tweet {
+      ...TweetInfo
+    }
+    comments {
+      ...TweetInfo
     }
   }
-  ${FullErrorInfoFragmentDoc}
-`;
+}
+    ${FullErrorInfoFragmentDoc}
+${TweetInfoFragmentDoc}`;
 
 /**
  * __useTweetCommentsQuery__
@@ -1126,57 +714,79 @@ export const TweetCommentsDocument = gql`
  *   },
  * });
  */
-export function useTweetCommentsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    TweetCommentsQuery,
-    TweetCommentsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<TweetCommentsQuery, TweetCommentsQueryVariables>(
-    TweetCommentsDocument,
-    options
-  );
-}
-export function useTweetCommentsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    TweetCommentsQuery,
-    TweetCommentsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<TweetCommentsQuery, TweetCommentsQueryVariables>(
-    TweetCommentsDocument,
-    options
-  );
-}
-export type TweetCommentsQueryHookResult = ReturnType<
-  typeof useTweetCommentsQuery
->;
-export type TweetCommentsLazyQueryHookResult = ReturnType<
-  typeof useTweetCommentsLazyQuery
->;
-export type TweetCommentsQueryResult = Apollo.QueryResult<
-  TweetCommentsQuery,
-  TweetCommentsQueryVariables
->;
-export const TweetsDocument = gql`
-  query Tweets($ids: [String!]!) {
-    tweets(ids: $ids) {
-      errors {
-        ...FullErrorInfo
+export function useTweetCommentsQuery(baseOptions: Apollo.QueryHookOptions<TweetCommentsQuery, TweetCommentsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TweetCommentsQuery, TweetCommentsQueryVariables>(TweetCommentsDocument, options);
       }
-      tweets {
-        ...TweetInfo
-        tweet {
-          ...TweetInfo
+export function useTweetCommentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TweetCommentsQuery, TweetCommentsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TweetCommentsQuery, TweetCommentsQueryVariables>(TweetCommentsDocument, options);
         }
+export type TweetCommentsQueryHookResult = ReturnType<typeof useTweetCommentsQuery>;
+export type TweetCommentsLazyQueryHookResult = ReturnType<typeof useTweetCommentsLazyQuery>;
+export type TweetCommentsQueryResult = Apollo.QueryResult<TweetCommentsQuery, TweetCommentsQueryVariables>;
+export const TweetWithCommentsDocument = gql`
+    query TweetWithComments($params: TweetCommentsParams!) {
+  tweetComments(params: $params) {
+    errors {
+      ...FullErrorInfo
+    }
+    nextSkip
+    nextTake
+    tweet {
+      ...TweetInfo
+    }
+    comments {
+      ...TweetInfo
+    }
+  }
+}
+    ${FullErrorInfoFragmentDoc}
+${TweetInfoFragmentDoc}`;
+
+/**
+ * __useTweetWithCommentsQuery__
+ *
+ * To run a query within a React component, call `useTweetWithCommentsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTweetWithCommentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTweetWithCommentsQuery({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useTweetWithCommentsQuery(baseOptions: Apollo.QueryHookOptions<TweetWithCommentsQuery, TweetWithCommentsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TweetWithCommentsQuery, TweetWithCommentsQueryVariables>(TweetWithCommentsDocument, options);
+      }
+export function useTweetWithCommentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TweetWithCommentsQuery, TweetWithCommentsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TweetWithCommentsQuery, TweetWithCommentsQueryVariables>(TweetWithCommentsDocument, options);
+        }
+export type TweetWithCommentsQueryHookResult = ReturnType<typeof useTweetWithCommentsQuery>;
+export type TweetWithCommentsLazyQueryHookResult = ReturnType<typeof useTweetWithCommentsLazyQuery>;
+export type TweetWithCommentsQueryResult = Apollo.QueryResult<TweetWithCommentsQuery, TweetWithCommentsQueryVariables>;
+export const TweetsDocument = gql`
+    query Tweets($ids: [String!]!) {
+  tweets(ids: $ids) {
+    errors {
+      ...FullErrorInfo
+    }
+    tweets {
+      ...TweetInfo
+      tweet {
+        ...TweetInfo
       }
     }
   }
-  ${FullErrorInfoFragmentDoc}
-  ${TweetInfoFragmentDoc}
-`;
+}
+    ${FullErrorInfoFragmentDoc}
+${TweetInfoFragmentDoc}`;
 
 /**
  * __useTweetsQuery__
@@ -1194,49 +804,35 @@ export const TweetsDocument = gql`
  *   },
  * });
  */
-export function useTweetsQuery(
-  baseOptions: Apollo.QueryHookOptions<TweetsQuery, TweetsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<TweetsQuery, TweetsQueryVariables>(
-    TweetsDocument,
-    options
-  );
-}
-export function useTweetsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<TweetsQuery, TweetsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<TweetsQuery, TweetsQueryVariables>(
-    TweetsDocument,
-    options
-  );
-}
+export function useTweetsQuery(baseOptions: Apollo.QueryHookOptions<TweetsQuery, TweetsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TweetsQuery, TweetsQueryVariables>(TweetsDocument, options);
+      }
+export function useTweetsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TweetsQuery, TweetsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TweetsQuery, TweetsQueryVariables>(TweetsDocument, options);
+        }
 export type TweetsQueryHookResult = ReturnType<typeof useTweetsQuery>;
 export type TweetsLazyQueryHookResult = ReturnType<typeof useTweetsLazyQuery>;
-export type TweetsQueryResult = Apollo.QueryResult<
-  TweetsQuery,
-  TweetsQueryVariables
->;
+export type TweetsQueryResult = Apollo.QueryResult<TweetsQuery, TweetsQueryVariables>;
 export const UserTweetsDocument = gql`
-  query UserTweets($params: UserTweetsParams!) {
-    userTweets(params: $params) {
-      errors {
-        ...FullErrorInfo
-      }
-      nextSkip
-      nextTake
-      tweets {
+    query UserTweets($params: UserTweetsParams!) {
+  userTweets(params: $params) {
+    errors {
+      ...FullErrorInfo
+    }
+    nextSkip
+    nextTake
+    tweets {
+      ...TweetInfo
+      tweet {
         ...TweetInfo
-        tweet {
-          ...TweetInfo
-        }
       }
     }
   }
-  ${FullErrorInfoFragmentDoc}
-  ${TweetInfoFragmentDoc}
-`;
+}
+    ${FullErrorInfoFragmentDoc}
+${TweetInfoFragmentDoc}`;
 
 /**
  * __useUserTweetsQuery__
@@ -1254,52 +850,30 @@ export const UserTweetsDocument = gql`
  *   },
  * });
  */
-export function useUserTweetsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    UserTweetsQuery,
-    UserTweetsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<UserTweetsQuery, UserTweetsQueryVariables>(
-    UserTweetsDocument,
-    options
-  );
-}
-export function useUserTweetsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    UserTweetsQuery,
-    UserTweetsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<UserTweetsQuery, UserTweetsQueryVariables>(
-    UserTweetsDocument,
-    options
-  );
-}
+export function useUserTweetsQuery(baseOptions: Apollo.QueryHookOptions<UserTweetsQuery, UserTweetsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserTweetsQuery, UserTweetsQueryVariables>(UserTweetsDocument, options);
+      }
+export function useUserTweetsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserTweetsQuery, UserTweetsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserTweetsQuery, UserTweetsQueryVariables>(UserTweetsDocument, options);
+        }
 export type UserTweetsQueryHookResult = ReturnType<typeof useUserTweetsQuery>;
-export type UserTweetsLazyQueryHookResult = ReturnType<
-  typeof useUserTweetsLazyQuery
->;
-export type UserTweetsQueryResult = Apollo.QueryResult<
-  UserTweetsQuery,
-  UserTweetsQueryVariables
->;
+export type UserTweetsLazyQueryHookResult = ReturnType<typeof useUserTweetsLazyQuery>;
+export type UserTweetsQueryResult = Apollo.QueryResult<UserTweetsQuery, UserTweetsQueryVariables>;
 export const CurrentUserDocument = gql`
-  query CurrentUser {
-    currentUser {
-      errors {
-        ...FullErrorInfo
-      }
-      user {
-        ...UserInfo
-      }
+    query CurrentUser {
+  currentUser {
+    errors {
+      ...FullErrorInfo
+    }
+    user {
+      ...UserInfo
     }
   }
-  ${FullErrorInfoFragmentDoc}
-  ${UserInfoFragmentDoc}
-`;
+}
+    ${FullErrorInfoFragmentDoc}
+${UserInfoFragmentDoc}`;
 
 /**
  * __useCurrentUserQuery__
@@ -1316,52 +890,30 @@ export const CurrentUserDocument = gql`
  *   },
  * });
  */
-export function useCurrentUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    CurrentUserQuery,
-    CurrentUserQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(
-    CurrentUserDocument,
-    options
-  );
-}
-export function useCurrentUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    CurrentUserQuery,
-    CurrentUserQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(
-    CurrentUserDocument,
-    options
-  );
-}
+export function useCurrentUserQuery(baseOptions?: Apollo.QueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(CurrentUserDocument, options);
+      }
+export function useCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(CurrentUserDocument, options);
+        }
 export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
-export type CurrentUserLazyQueryHookResult = ReturnType<
-  typeof useCurrentUserLazyQuery
->;
-export type CurrentUserQueryResult = Apollo.QueryResult<
-  CurrentUserQuery,
-  CurrentUserQueryVariables
->;
+export type CurrentUserLazyQueryHookResult = ReturnType<typeof useCurrentUserLazyQuery>;
+export type CurrentUserQueryResult = Apollo.QueryResult<CurrentUserQuery, CurrentUserQueryVariables>;
 export const UserDocument = gql`
-  query User($username: String!) {
-    user(username: $username) {
-      errors {
-        ...FullErrorInfo
-      }
-      user {
-        ...UserInfo
-      }
+    query User($username: String!) {
+  user(username: $username) {
+    errors {
+      ...FullErrorInfo
+    }
+    user {
+      ...UserInfo
     }
   }
-  ${FullErrorInfoFragmentDoc}
-  ${UserInfoFragmentDoc}
-`;
+}
+    ${FullErrorInfoFragmentDoc}
+${UserInfoFragmentDoc}`;
 
 /**
  * __useUserQuery__
@@ -1379,36 +931,30 @@ export const UserDocument = gql`
  *   },
  * });
  */
-export function useUserQuery(
-  baseOptions: Apollo.QueryHookOptions<UserQuery, UserQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<UserQuery, UserQueryVariables>(UserDocument, options);
-}
-export function useUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<UserQuery, UserQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<UserQuery, UserQueryVariables>(
-    UserDocument,
-    options
-  );
-}
+export function useUserQuery(baseOptions: Apollo.QueryHookOptions<UserQuery, UserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserQuery, UserQueryVariables>(UserDocument, options);
+      }
+export function useUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserQuery, UserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserQuery, UserQueryVariables>(UserDocument, options);
+        }
 export type UserQueryHookResult = ReturnType<typeof useUserQuery>;
 export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
 export type UserQueryResult = Apollo.QueryResult<UserQuery, UserQueryVariables>;
 export const FeedNotificationsDocument = gql`
-  subscription FeedNotifications {
-    feedNotifications {
-      errors {
-        field
-        message
-        type
-      }
-      tweetId
+    subscription FeedNotifications {
+  feedNotifications {
+    errors {
+      field
+      message
+      type
     }
+    tweetId
+    userId
   }
-`;
+}
+    `;
 
 /**
  * __useFeedNotificationsSubscription__
@@ -1425,20 +971,9 @@ export const FeedNotificationsDocument = gql`
  *   },
  * });
  */
-export function useFeedNotificationsSubscription(
-  baseOptions?: Apollo.SubscriptionHookOptions<
-    FeedNotificationsSubscription,
-    FeedNotificationsSubscriptionVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSubscription<
-    FeedNotificationsSubscription,
-    FeedNotificationsSubscriptionVariables
-  >(FeedNotificationsDocument, options);
-}
-export type FeedNotificationsSubscriptionHookResult = ReturnType<
-  typeof useFeedNotificationsSubscription
->;
-export type FeedNotificationsSubscriptionResult =
-  Apollo.SubscriptionResult<FeedNotificationsSubscription>;
+export function useFeedNotificationsSubscription(baseOptions?: Apollo.SubscriptionHookOptions<FeedNotificationsSubscription, FeedNotificationsSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<FeedNotificationsSubscription, FeedNotificationsSubscriptionVariables>(FeedNotificationsDocument, options);
+      }
+export type FeedNotificationsSubscriptionHookResult = ReturnType<typeof useFeedNotificationsSubscription>;
+export type FeedNotificationsSubscriptionResult = Apollo.SubscriptionResult<FeedNotificationsSubscription>;

@@ -6,10 +6,7 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
-  ModalHeader,
   ModalOverlay,
-  Text,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
@@ -21,7 +18,7 @@ import {
   Tweet,
   useUnvoteMutation,
   useVoteMutation,
-} from '../../graphql/generated/graphql';
+} from '../../../graphql/generated/graphql';
 import { useState } from 'react';
 import TweetForm from './TweetForm';
 import TweetData from './TweetData';
@@ -51,6 +48,7 @@ const TweetInteractions: React.FC<Tweet> = props => {
           position: 'bottom',
           isClosable: true,
           status: 'success',
+          duration: 1000,
         });
         setHasVoted(true);
 
@@ -78,6 +76,7 @@ const TweetInteractions: React.FC<Tweet> = props => {
           position: 'bottom',
           isClosable: true,
           status: 'info',
+          duration: 1000,
         });
         setHasVoted(false);
 
@@ -96,6 +95,13 @@ const TweetInteractions: React.FC<Tweet> = props => {
     },
   });
 
+  const handleComment = ({ tweet }: Tweet) => {
+    if (tweet?.commentsCount !== undefined) {
+      setCommentsCount(tweet?.commentsCount);
+    }
+    onClose();
+  };
+
   return (
     <Box display="flex" justifyContent="space-around" mt={4} fontSize={22}>
       <Button
@@ -104,6 +110,7 @@ const TweetInteractions: React.FC<Tweet> = props => {
         variant="ghost"
         _focus={{ outline: 'none', bgColor: 'transparent' }}
         _hover={{ bgColor: 'transparent' }}
+        _active={{ bgColor: 'transparent' }}
         as="div"
         onClick={onOpen}
       >
@@ -119,7 +126,10 @@ const TweetInteractions: React.FC<Tweet> = props => {
           minW={8}
           mr={2}
           _focus={{ outline: 'none' }}
-          onClick={onOpen}
+          onClick={e => {
+            e.stopPropagation();
+            onOpen();
+          }}
         />
         {commentsCount}
       </Button>
@@ -130,9 +140,11 @@ const TweetInteractions: React.FC<Tweet> = props => {
           variant="ghost"
           _focus={{ outline: 'none' }}
           _hover={{ bgColor: 'transparent' }}
+          _active={{ bgColor: 'transparent' }}
           as="div"
           isLoading={isLoadingVote}
-          onClick={async () => {
+          onClick={async e => {
+            e.stopPropagation();
             setIsLoadingVote(true);
             await unvoteForTweet();
             setIsLoadingVote(false);
@@ -161,9 +173,11 @@ const TweetInteractions: React.FC<Tweet> = props => {
           variant="ghost"
           _focus={{ outline: 'none', bgColor: 'transparent' }}
           _hover={{ bgColor: 'transparent' }}
+          _active={{ bgColor: 'transparent' }}
           as="div"
           isLoading={isLoadingVote}
-          onClick={async () => {
+          onClick={async e => {
+            e.stopPropagation();
             setIsLoadingVote(true);
             await voteForTweet();
             setIsLoadingVote(false);
@@ -195,8 +209,9 @@ const TweetInteractions: React.FC<Tweet> = props => {
               <TweetData {...props} />
             </Box>
             <TweetForm
-              onSubmit={onClose}
+              onSubmit={handleComment}
               placeholder="Tweet your reply"
+              textBtn="Reply"
               tweetId={id}
             />
           </ModalBody>

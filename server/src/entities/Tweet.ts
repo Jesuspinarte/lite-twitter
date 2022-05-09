@@ -78,6 +78,9 @@ export class TweetSubscriptionResponse {
 
   @Field(() => String, { nullable: true })
   tweetId?: string;
+
+  @Field(() => String, { nullable: true })
+  userId?: string;
 }
 
 @ObjectType()

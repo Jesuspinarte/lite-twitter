@@ -1,4 +1,4 @@
-query TweetComments($params: TweetCommentsParams!) {
+query TweetWithComments($params: TweetCommentsParams!) {
   tweetComments(params: $params) {
     errors {
       ...FullErrorInfo

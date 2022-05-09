@@ -1,8 +1,8 @@
 import { Flex, Text, useColorModeValue } from '@chakra-ui/react';
 import React, { Fragment, useMemo } from 'react';
-import { Tweet } from '../../graphql/generated/graphql';
-import timeAgo from '../../utils/timeAgo';
-import UserInfo from '../shared/UserInfo';
+import { Tweet } from '../../../graphql/generated/graphql';
+import timeAgo from '../../../utils/timeAgo';
+import UserInfo from '../UserInfo';
 
 const TweetData: React.FC<Tweet> = ({
   text,

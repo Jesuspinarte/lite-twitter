@@ -6,5 +6,6 @@ subscription FeedNotifications {
       type
     }
     tweetId
+    userId
   }
 }

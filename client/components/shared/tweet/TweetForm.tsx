@@ -10,17 +10,22 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
-import { usePostTweetMutation } from '../../graphql/generated/graphql';
+import {
+  Tweet,
+  usePostTweetMutation,
+} from '../../../graphql/generated/graphql';
 
 interface TweetFormProps {
-  onSubmit?: () => void;
+  onSubmit?: (tweet: Tweet) => void;
   placeholder?: string;
+  textBtn?: string;
   tweetId?: string;
 }
 
 const TweetForm: React.FC<TweetFormProps> = ({
   onSubmit,
   placeholder,
+  textBtn,
   tweetId,
 }) => {
   const bgColor = useColorModeValue('#dcdcdc', 'whiteAlpha.300');
@@ -80,9 +85,9 @@ const TweetForm: React.FC<TweetFormProps> = ({
 
     if (tweetText.current?.value) {
       setIsLoading(true);
-      await postTweet();
-      if (onSubmit) {
-        onSubmit();
+      const tweetResponse = await postTweet();
+      if (onSubmit && tweetResponse.data?.postTweet.tweet) {
+        onSubmit(tweetResponse.data?.postTweet.tweet as Tweet);
       }
       setIsLoading(false);
     }
@@ -155,7 +160,7 @@ const TweetForm: React.FC<TweetFormProps> = ({
           pl={10}
           isLoading={isLoading}
         >
-          Tweet
+          {textBtn || 'Tweet'}
         </Button>
       </Flex>
     </Flex>

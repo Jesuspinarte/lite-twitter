@@ -16,17 +16,18 @@ import {
   useTweetsLazyQuery,
 } from '../../graphql/generated/graphql';
 import { client } from '../../pages/_app';
-import TweetBox from './TweetBox';
 
-import TweetForm from './TweetForm';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import TweetForm from '../shared/tweet/TweetForm';
 import { HiArrowSmUp } from 'react-icons/hi';
+import { useUserContext } from 'providers/UserProvider';
+import { ScrollTweets } from 'components/shared/ScrollTweets';
 
 export interface FeedProps {
   tweets: Tweet[];
   nextSkip: number | null;
   nextTake: number | null;
 }
+
 const Feed: React.FC<FeedProps> = ({
   tweets: firstTweets,
   nextSkip,
@@ -36,17 +37,19 @@ const Feed: React.FC<FeedProps> = ({
   const [newTweetsIds, setNewTweetsIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingTop, setIsLoadingTop] = useState(false);
+  const [autoLoadMoreTweets, setAutoLoadMoreTweets] = useState(false);
   const loadMoreTweetsBtnRef = useRef<ToastId | undefined>();
   const [skip, setSkip] = useState<number | null | undefined>(nextSkip);
   const [take, setTake] = useState<number | null | undefined>(nextTake);
   const toast = useToast();
+  const { user } = useUserContext();
 
   const menuBoxShadowColor = useColorModeValue(
     '-1px 0 10px 1px #ccc',
     '-1px 0 10px 1px #111'
   );
 
-  const [queryNewTwetts] = useTweetsLazyQuery();
+  const [queryNewTweets] = useTweetsLazyQuery();
 
   const loadNewTweets = useCallback(async () => {
     setIsLoadingTop(true);
@@ -56,11 +59,13 @@ const Feed: React.FC<FeedProps> = ({
       toast.close(loadMoreTweetsBtnRef.current);
     }
 
-    await queryNewTwetts({
+    await queryNewTweets({
       variables: { ids: newTweetsIds },
       onCompleted: ({ tweets: { errors, tweets } }) => {
         if (!errors) {
           setTweets(prevState => [...(tweets as Tweet[]), ...prevState]);
+          setNewTweetsIds([]);
+          setAutoLoadMoreTweets(false);
         } else {
           toast({
             title: errors[0].field || errors[0].type || 'Unexpected error.',
@@ -73,7 +78,7 @@ const Feed: React.FC<FeedProps> = ({
         setIsLoadingTop(false);
       },
     });
-  }, [toast, newTweetsIds, queryNewTwetts]);
+  }, [toast, newTweetsIds, queryNewTweets]);
 
   const [queryMoreTweets] = useFeedLazyQuery({
     variables: {
@@ -112,7 +117,7 @@ const Feed: React.FC<FeedProps> = ({
   };
 
   useEffect(() => {
-    if (newTweetsIds.length) {
+    if (newTweetsIds.length && !autoLoadMoreTweets) {
       loadMoreTweetsBtnRef.current = toast({
         position: 'top',
         duration: null,
@@ -129,18 +134,28 @@ const Feed: React.FC<FeedProps> = ({
         ),
       });
     }
-  }, [newTweetsIds, toast, loadNewTweets]);
+  }, [newTweetsIds, toast, loadNewTweets, autoLoadMoreTweets]);
+
+  useEffect(() => {
+    if (autoLoadMoreTweets) {
+      loadNewTweets();
+    }
+  }, [autoLoadMoreTweets, loadNewTweets]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       client.subscribe({ query: FeedNotificationsDocument }).subscribe({
         next({
           data: {
-            feedNotifications: { errors, tweetId },
+            feedNotifications: { errors, tweetId, userId },
           },
         }) {
           if (!errors) {
             setNewTweetsIds(prevState => [tweetId, ...prevState]);
+
+            if (userId === user?.id) {
+              setAutoLoadMoreTweets(true);
+            }
           } else {
             toast({
               title: errors[0].field || errors[0].type || 'Unexpected error.',
@@ -156,7 +171,7 @@ const Feed: React.FC<FeedProps> = ({
         },
       });
     }
-  }, [toast]);
+  }, [toast, user]);
 
   return (
     <Flex
@@ -172,23 +187,12 @@ const Feed: React.FC<FeedProps> = ({
           <Spinner size="lg" />
         </Flex>
       )}
-      <Box>
-        <InfiniteScroll
-          dataLength={tweets.length}
-          next={take === null ? () => {} : loadMoreTweets}
-          hasMore={take !== null}
-          loader={null}
-        >
-          {tweets.map(tweet => (
-            <TweetBox key={tweet.id} {...tweet} />
-          ))}
-        </InfiniteScroll>
-        {isLoading && (
-          <Flex justifyContent="center" alignItems="center" width="100%" p={4}>
-            <Spinner size="lg" />
-          </Flex>
-        )}
-      </Box>
+      <ScrollTweets
+        tweets={tweets}
+        next={take === null ? () => {} : loadMoreTweets}
+        hasMore={take !== null}
+        isLoading={isLoading}
+      />
     </Flex>
   );
 };
