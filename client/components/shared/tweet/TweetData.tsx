@@ -1,8 +1,9 @@
-import { Flex, Text, useColorModeValue } from '@chakra-ui/react';
+import { Flex, Link, Text, useColorModeValue } from '@chakra-ui/react';
 import React, { Fragment, useMemo } from 'react';
 import { Tweet } from '../../../graphql/generated/graphql';
 import timeAgo from '../../../utils/timeAgo';
 import UserInfo from '../UserInfo';
+import NextLink from 'next/link';
 
 const TweetData: React.FC<Tweet> = ({
   text,
@@ -21,7 +22,19 @@ const TweetData: React.FC<Tweet> = ({
   const bodyText = useMemo(
     () =>
       text.split(/([\#|\@]\w\w+\s?)/g).map((t, i) =>
-        t.match(/[\#|\@]\w\w+\s?/g) ? (
+        t.match(/[\@]\w\w+\s?/g) ? (
+          <NextLink key={i} href={`/${t.substring(1)}`} passHref>
+            <Link
+              mt={6}
+              mb={10}
+              color={textMentionColor}
+              fontWeight="500"
+              onClick={e => e.stopPropagation()}
+            >
+              {t}
+            </Link>
+          </NextLink>
+        ) : t.match(/[\#]\w\w+\s?/g) ? (
           <Text key={i} as="a" color={textMentionColor} fontWeight="500">
             {t}
           </Text>

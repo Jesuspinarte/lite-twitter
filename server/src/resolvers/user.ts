@@ -71,7 +71,7 @@ export default class UserResolver {
       user = await prisma.user.findFirst({
         where: {
           username: {
-            contains: userInput.username,
+            equals: userInput.username,
             mode: 'insensitive',
           },
         },
@@ -306,7 +306,7 @@ export default class UserResolver {
     try {
       user = await prisma.user.findFirst({
         where: {
-          username: { contains: username, mode: 'insensitive' }
+          username: { equals: username, mode: 'insensitive' }
         }
       });
 

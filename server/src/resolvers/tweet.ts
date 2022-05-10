@@ -248,7 +248,7 @@ export default class TweetResolver {
       const user = await prisma.user.findFirst({
         where: {
           username: {
-            contains: params.username, mode: 'insensitive'
+            equals: params.username, mode: 'insensitive'
           }
         }
       });
@@ -266,7 +266,7 @@ export default class TweetResolver {
         where: {
           user: {
             username: {
-              contains: params.username, mode: 'insensitive'
+              equals: params.username, mode: 'insensitive'
             }
           }
         }
@@ -281,7 +281,7 @@ export default class TweetResolver {
         where: {
           user: {
             username: {
-              contains: params.username, mode: 'insensitive'
+              equals: params.username, mode: 'insensitive'
             }
           }
         }
