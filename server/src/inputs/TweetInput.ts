@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+import { FileUpload, GraphQLUpload } from "graphql-upload";
 
 @InputType()
 export default class TweetInput {
@@ -41,3 +42,10 @@ export class TweetCommentsParams {
   @Field({ nullable: true })
   take?: number;
 }
+
+@InputType()
+export class FileInput {
+  @Field(() => GraphQLUpload)
+  image: FileUpload;
+}
+

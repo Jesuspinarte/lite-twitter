@@ -4,8 +4,14 @@ import { setContext } from '@apollo/client/link/context';
 import { createClient } from 'graphql-ws';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { getMainDefinition } from '@apollo/client/utilities';
+import { createUploadLink } from 'apollo-upload-client';
 
-export const httpLink = createHttpLink({
+// export const httpLink = createHttpLink({
+//   uri: 'http://localhost:4000/graphql',
+//   credentials: 'include',
+// });
+
+export const httpLink = createUploadLink({
   uri: 'http://localhost:4000/graphql',
   credentials: 'include',
 });

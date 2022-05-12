@@ -12,9 +12,22 @@ import { LTContext } from '../utils/types';
 import { getAuthUser } from '../utils/helpers';
 import ErrorMessage from '../entities/ErrorMessage';
 import User from '../entities/User';
+import { FileUpload, GraphQLUpload } from 'graphql-upload';
+// import { FileInput } from '../inputs/TweetInput';
+// import { FileUpload } from 'graphql-upload';
 
 @Resolver(Vote)
 export default class VoteResolver {
+  @Mutation(() => Boolean)
+  async uploadImage(@Arg('file', () => GraphQLUpload) image: FileUpload, @Ctx() { prisma }: LTContext) {
+    // const { filename, mimetype, createReadStream } = await image;
+    // const { createReadStream } = await image;
+    const { createReadStream } = await image;
+    const stream = createReadStream();
+    console.log(prisma, stream);
+    return true;
+  }
+
   @Mutation(() => VoteResponse)
   async vote(
     @Arg('tweetId') tweetId: string,

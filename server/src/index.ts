@@ -19,6 +19,7 @@ import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import { PubSub } from 'graphql-subscriptions';
+import { graphqlUploadExpress } from 'graphql-upload';
 
 export const prisma = new PrismaClient();
 const pubsub = new PubSub();
@@ -86,6 +87,9 @@ async function main() {
     })
   );
 
+  // app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
+  app.use(graphqlUploadExpress());
+
   console.log('💿 Creating server...');
   const server = new ApolloServer({
     schema: schema,
@@ -107,7 +111,6 @@ async function main() {
       prisma,
       pubsub,
     }),
-
   });
 
   console.log('▶ Starting apollo...');
